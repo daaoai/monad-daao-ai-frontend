@@ -147,12 +147,13 @@ const HomePage: NextPage = () => {
       // If not finalised, redirect to the contribution page
       router.push('/dapp/contribution');
     }
-
-    // Navigate to the fund page if connected
-    // router.push(`/dapp/${fundId}`);
   };
   const redirectToDashboard = () => {
-    router.push('/dapp/1');
+    if (isFinalised) {
+      router.push('/dapp/1');
+    } else {
+      router.push('/dapp/contribution');
+    }
   };
 
   return (
