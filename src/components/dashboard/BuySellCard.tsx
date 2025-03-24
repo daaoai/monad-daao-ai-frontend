@@ -422,7 +422,7 @@ const BuySellCard = () => {
           </Tabs>
         </div>
 
-        <div className="flex w-full gap-2 items-center justify-between">
+        {/* <div className="flex w-full gap-2 items-center justify-between">
           <button
             onClick={() => setAmountFrom('1000')}
             className="bg-gray-40 rounded-md p-2 text-sm active:scale-95 transition-transform ease-in-out duration-150"
@@ -447,7 +447,7 @@ const BuySellCard = () => {
           >
             100000 MODE
           </button>
-        </div>
+        </div> */}
 
         <Card className="bg-gray-50 border-2 border-gray-20">
           <CardContent className="p-4 flex justify-between items-center">

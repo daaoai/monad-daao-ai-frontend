@@ -48,7 +48,7 @@ const DeployDAO: React.FC = () => {
       const maxPublicContributionAmount = web3.utils.toWei('20', 'ether');
       const fundraisingDeadline = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
       const fundExpiry = fundraisingDeadline + 30 * 24 * 60 * 60;
-      const liquidityLockerFactory = '0x4086781DB8a2f843C7917a56e462f4A19c5537eb';
+      const liquidityLockerFactory = '0x003dedB033F4b7705418a82F7513471070f6BF53';
       const protocolAdmin = accounts[0];
 
       const deployTx = Daocontract.deploy({

@@ -35,7 +35,7 @@ const Upcoming: React.FC = () => {
     telegramLink: 'https://t.me/defaicartel',
     website: CURRENT_DAO_LINK,
     description:
-      'DeFAI Venture DAO is a DeFAI Investment DAO dedicated to advancing the DeFAI movement by strategically investing in AI Agents and AI-focused DAOs on Mode. As a collective force in decentralized AI finance, $CARTEL empowers the AI-driven movement on Mode, fostering the growth of autonomous, AI-powered ecosystems.',
+      'Sorcerer is an investment DAO on Monad, that strategically fund AI agents and AI-driven projects, empowering the next wave of decentralized intelligence and autonomous ecosystems.',
     aboutToken: `
       The raised funds will be used to invest in early DeFAI projects on Mode, and purchased allocations will be added to the treasury.
 

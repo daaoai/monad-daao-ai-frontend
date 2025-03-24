@@ -50,11 +50,10 @@ export const DefaiCartelLinks: FooterData[] = [
 export const WHITEPAPER_URL = 'https://docsend.com/view/z9eqsrurcmdky2dn';
 export const FUND_CARD_PLACEHOLDER_IMAGE: string = '/assets/new-upcoming-img.jpeg';
 export const CURRENT_DAO_LINK = 'https://www.defaicartel.xyz/';
-export const CURRENT_DAO_IMAGE = '/assets/defiCartel.png';
+export const CURRENT_DAO_IMAGE = '/assets/testing.svg';
 export const GAMBLE_IMAGE = '/assets/gamble.jpeg';
-
 export const tokenImageLinks = {
   GAMBL: '/assets/gamble.jpeg',
-  CARTEL: '/assets/defiCartel.png',
+  CARTEL: '/assets/testing.svg',
   PACKY: '/assets/packy.jpg',
 };

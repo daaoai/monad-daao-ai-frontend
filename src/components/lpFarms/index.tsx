@@ -176,7 +176,7 @@ const LPFarms: React.FC<LPFarmsProps> = ({ onClose, daoTokenAddress }) => {
                   className="absolute left-0 top-0 w-[35px] h-[35px] rounded-full"
                 />
                 <Image
-                  src="/assets/defai-cartel-image.svg"
+                  src="/assets/testing.svg"
                   alt="DeFai Cartel"
                   width={16}
                   height={16}
@@ -215,7 +215,7 @@ const LPFarms: React.FC<LPFarmsProps> = ({ onClose, daoTokenAddress }) => {
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <Image
-                  src="/assets/defai-cartel-image.svg"
+                  src="/assets/testing.svg"
                   alt="DeFai Cartel"
                   width={16}
                   height={16}

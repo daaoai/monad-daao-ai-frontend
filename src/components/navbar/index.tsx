@@ -12,7 +12,7 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: 'Farms', href: '/dapp/farms' },
+    // { name: 'Farms', href: '/dapp/farms' },
     {
       name: 'Launch DAO',
       href: 'https://docs.google.com/forms/d/e/1FAIpQLScbKuEH18VXPg29Ek4yeX3spXclZCXV6HHfDtmK9Vh8XMQigA/viewform?usp=header',

@@ -28,7 +28,7 @@ import { DAO } from '@/daao-sdk/abi/dao';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/shadcn/components/ui/dialog';
 import { Button } from '@/shadcn/components/ui/button';
 import { Input } from '@/shadcn/components/ui/input';
-import { modeChainId, tickSpacing } from '@/constants/modeChain';
+import { monadChainId, tickSpacing } from '@/constants/modeChain';
 import Link from 'next/link';
 
 bn.config({ EXPONENTIAL_AT: 999999, DECIMAL_PLACES: 40 });
@@ -48,8 +48,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ onClose }) => {
 
   const Q96 = JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(96));
   const Q192 = JSBI.exponentiate(Q96, JSBI.BigInt(2));
-  const RPC_URL = 'https://mainnet.mode.network/';
-  const MODE_NETWORK_CHAIN_ID = Number(modeChainId);
+  const RPC_URL = 'https://testnet-rpc.monad.xyz';
+  const MODE_NETWORK_CHAIN_ID = Number(monadChainId);
 
   const { isConnected, address } = useAccount();
 
@@ -641,7 +641,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ onClose }) => {
     <div className="liquidity_main-container max-h-[80vh] sm:max-h-none overflow-y-auto z-50">
       <div className="flex flex-col md:flex-row gap-6 bg-gray-40 p-8 items-center justify-center rounded-lg">
         <div className="flex flex-col gap-6 items-start">
-          <Image src="/assets/defaiCartel.svg" alt="defai-cartel" width={400} height={400} />
+          <Image src="/assets/testing.svg" alt="defai-cartel" width={400} height={400} />
           <div className="flex flex-col items-start gap-4">
             <p className="text-2xl font-sora font-medium text-white">DeFAI Cartel</p>
             <Link

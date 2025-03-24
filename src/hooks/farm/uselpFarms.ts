@@ -22,7 +22,7 @@ import { ethers } from 'ethers';
 import { toast as reactToast } from 'react-toastify'; // Ensure to import react-toastify's toast function
 
 const POOL_ADDRESS = '0xf70e76cc5a39aad1953bef3d1647c8b36f3f6324';
-const UNISWAP_V3_STAKER = '0xd9cC1D4565102AE6118476EF0E531e7956487099';
+const UNISWAP_V3_STAKER = '0x961235a9020B05C44DF1026D956D1F4D78014276';
 
 const useLpFarms = () => {
   // const { toast } = useToast();

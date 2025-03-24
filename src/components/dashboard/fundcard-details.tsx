@@ -79,7 +79,7 @@ const FundDetails: React.FC<FundDetailsProps> = (props) => {
   };
 
   useEffect(() => {
-    const modeRpc = 'https://mainnet.mode.network/';
+    const modeRpc = 'https://testnet-rpc.monad.xyz';
     const fetchMarketData = async () => {
       const provider = new ethers.providers.JsonRpcProvider(modeRpc);
 
@@ -130,13 +130,7 @@ const FundDetails: React.FC<FundDetailsProps> = (props) => {
   return (
     <Card className="text-white sm:p-2  w-full border-none">
       <div className="w-full">
-        <Image
-          src="/assets/defai-cartel-image.svg"
-          alt="defai-cartel"
-          width={600}
-          height={300}
-          style={{ width: '100%' }}
-        />
+        <Image src="/assets/testing.svg" alt="defai-cartel" width={300} height={200} />
       </div>
 
       {/* <div className="flex items-center gap-4 sm:gap-6">
@@ -190,7 +184,7 @@ const FundDetails: React.FC<FundDetailsProps> = (props) => {
       </div>
       <div className="flex justify-between w-full mb-4">
         <div className="w-fit flex gap-x-2 items-center">
-          <h5 className="text-sm sm:text-base lg:text-lg text-[#D0F0BF]">$CARTEL</h5>
+          <h5 className="text-sm sm:text-base lg:text-lg text-[#D0F0BF]">$Sorcerer</h5>
           <div className="bg-[#053738] p-1 rounded-2xl flex gap-x-2 px-3">
             <p className="text-sm sm:text-base lg:text-lg">{shortenAddress(daoTokenAddress)}</p>
             <ClickToCopy copyText={daoTokenAddress} className="text-teal-20" />
@@ -230,11 +224,10 @@ const FundDetails: React.FC<FundDetailsProps> = (props) => {
         </div>
       </div>
       <div className="flex w-full flex-col items-start gap-y-3 pb-6">
-        <h2 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold">DeFAI Cartel</h2>
+        <h2 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold">Sorcerer</h2>
         <p className=" sm:text-xs lg:text-sm text-left text-[#AEB3B6]">
-          DeFAI Venture DAO is a DeFAI Investment DAO dedicated to advancing the DeFAI movement by strategically
-          investing in AI Agents and AI-focused DAOs on Mode. As a collective force in decentralized AI finance, $CARTEL
-          empowers the AI-driven movement on Mode, fostering the growth of autonomous, AI-powered ecosystems.{' '}
+          Sorcerer is an investment DAO on Monad, that strategically fund AI agents and AI-driven projects, empowering
+          the next wave of decentralized intelligence and autonomous ecosystems.
         </p>
       </div>
       <div className="w-full">

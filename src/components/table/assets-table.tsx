@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel } from '@tanstack/react-table';
 import Image from 'next/image';
 const ICONS = {
-  CARTEL: '/assets/defaiCartel.svg',
+  CARTEL: '/assets/testing.svg',
   MODE: '/assets/mode.png',
   GAMBL: '/assets/gamble.jpeg',
 };

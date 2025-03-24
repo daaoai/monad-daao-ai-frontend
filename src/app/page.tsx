@@ -36,7 +36,7 @@ const HomePage: NextPage = () => {
   const router = useRouter();
   const { toast } = useToast();
   useEffect(() => {
-    const modeRpc = 'https://mainnet.mode.network/';
+    const modeRpc = 'https://testnet-rpc.monad.xyz';
     const fetchMarketData = async () => {
       const provider = new ethers.providers.JsonRpcProvider(modeRpc);
 
@@ -78,10 +78,10 @@ const HomePage: NextPage = () => {
     return [
       {
         id: '1',
-        title: 'DeFAI Cartel',
-        token: 'CARTEL',
+        title: 'Sorcerer',
+        token: 'Sorcerer',
         status: 'trading',
-        imgSrc: '/assets/defaiCartel.svg',
+        imgSrc: '/assets/testing.svg',
       },
       {
         id: '178',
@@ -161,7 +161,7 @@ const HomePage: NextPage = () => {
         {/* Foreground content */}
         <div className="relative z-10 flex flex-col md:flex-row justify-between gap-10 lg:gap-20 w-full pt-24 items-center">
           <Image
-            src="/assets/defaiCartel.svg"
+            src="/assets/testing.svg"
             alt="defai-cartel"
             width={400}
             height={400}
@@ -169,7 +169,7 @@ const HomePage: NextPage = () => {
             className="cursor-pointer"
           />
           <div className="flex flex-col sm:items-start gap-6">
-            <p className="text-5xl font-sora font-medium text-white">DeFAI Cartel</p>
+            <p className="text-5xl font-sora font-medium text-white">Sorcerer</p>
             <Link
               href="https://velodrome.finance/swap?from=0xdfc7c877a950e49d2610114102175a06c2e3167a&to=0x98e0ad23382184338ddcec0e13685358ef845f30&chain0=34443&chain1=34443"
               className="text-teal-60 font-normal"
@@ -177,10 +177,8 @@ const HomePage: NextPage = () => {
               Trade On Velodrome
             </Link>
             <p className="text-gray-10 font-normal font-rubik text-lg text-left">
-              DeFAI Venture DAO is a DeFAI Investment DAO dedicated to advancing the DeFAI movement by strategically
-              investing in AI Agents and AI-focused DAOs on Mode. As a collective force in decentralized AI finance,
-              $CARTEL empowers the AI-driven movement on Mode, fostering the growth of autonomous, AI-powered
-              ecosystems.
+              Sorcerer is an investment DAO on Monad, that strategically fund AI agents and AI-driven projects,
+              empowering the next wave of decentralized intelligence and autonomous ecosystems.
             </p>
             <PoolDetailCard marketCap={marketCap || 0} liquidity={liquidity || 0} volume={volume || 0} />
           </div>
