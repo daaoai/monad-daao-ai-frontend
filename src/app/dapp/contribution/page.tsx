@@ -114,7 +114,7 @@ export default function Page() {
                 <div className="flex flex-col  items-start mb-1 justify-start">
                   <p className="text-[#C4F82A] font-medium">Total Raised</p>
                   <p className="text-sm font-bold">
-                    {daoInfoData?.totalRaised} MODE ($
+                    {daoInfoData?.totalRaised} MONAD ($
                     {daoInfoData?.totalRaised ? (daoInfoData?.totalRaised * modePrice).toFixed(2) : 0})
                   </p>
                 </div>
@@ -158,7 +158,7 @@ export default function Page() {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Funding Goal</span>
                   <span>
-                    MODE {daoInfoData?.finalizeFundraisingGoal} ($
+                    MONAD {daoInfoData?.finalizeFundraisingGoal} ($
                     {daoInfoData?.finalizeFundraisingGoal
                       ? (daoInfoData?.finalizeFundraisingGoal * modePrice).toFixed(2)
                       : 0}
