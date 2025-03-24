@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    container_name: daao-app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - daao-network
+
+  db:
+    image: postgres:alpine
+    container_name: daao-db
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - daao-db-volume:/var/lib/postgresql/data
+    networks:
+      - daao-network
+    restart: always
+
+volumes:
+  daao-db-volume:
+
+networks:
+  daao-network:
+    driver: bridge
