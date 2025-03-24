@@ -24,17 +24,19 @@ import { useToast } from '@/hooks/use-toast';
 import { ConnectWalletButton } from '@/components/connect-button';
 import PoolDetailCard from '@/components/poolDetailCard';
 import FAQDaao from '@/components/faqDaao';
+import { useFetchBalance } from '@/hooks/useFetchBalance';
 
 const HomePage: NextPage = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [price, setPrice] = useState<number | null>(0);
   const [marketCap, setMarketCap] = useState<number | null>(null);
   const [liquidity, setLiquidity] = useState<number | null>(null);
   const [volume, setVolume] = useState<number | null>(null);
-
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const router = useRouter();
   const { toast } = useToast();
+  const { data: fetchedData, refreshData } = useFetchBalance(address);
+  console.log({ fetchedData: fetchedData.finalisedFundraising });
+  const isFinalised = fetchedData.finalisedFundraising;
   useEffect(() => {
     const modeRpc = 'https://testnet-rpc.monad.xyz';
     const fetchMarketData = async () => {
@@ -137,8 +139,17 @@ const HomePage: NextPage = () => {
       });
       return;
     }
+
+    if (isFinalised) {
+      // If finalised, redirect to the fund page
+      router.push(`/dapp/${fundId}`);
+    } else {
+      // If not finalised, redirect to the contribution page
+      router.push('/dapp/contribution');
+    }
+
     // Navigate to the fund page if connected
-    router.push(`/dapp/${fundId}`);
+    // router.push(`/dapp/${fundId}`);
   };
   const redirectToDashboard = () => {
     router.push('/dapp/1');
