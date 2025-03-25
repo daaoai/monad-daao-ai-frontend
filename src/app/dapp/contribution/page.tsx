@@ -10,7 +10,7 @@ import { useAccount } from 'wagmi';
 import useContribution from '@/hooks/farm/useContribution';
 import useTokenPrice from '@/hooks/useTokenPrice';
 import { modeTokenAddress } from '@/constants/addresses';
-
+import { toast as reactToast } from 'react-toastify';
 const TIER_NAMES = {
   0: 'None',
   1: 'Silver',
@@ -51,7 +51,11 @@ export default function Page() {
 
   async function handleContribute() {
     const amount = Number.parseFloat(inputValue);
+
     if (!isNaN(amount) && amount > 0) {
+      if (amount < 0.1) {
+        reactToast.error('Amount should be lower than 0.1');
+      }
       setCommitted((prev) => prev + amount);
       await contribute(Number(inputValue));
       setInputValue('');
@@ -80,6 +84,7 @@ export default function Page() {
   useEffect(() => {
     const fetchDaoInfo = async () => {
       const daoInfo = await getDaoInfo();
+      console.log(daoInfo, 'uyhgbnkiuh');
       if (daoInfo) {
         setDaoInfoData(daoInfo);
       }
