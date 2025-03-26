@@ -11,24 +11,27 @@ import useContribution from '@/hooks/farm/useContribution';
 import useTokenPrice from '@/hooks/useTokenPrice';
 import { modeTokenAddress } from '@/constants/addresses';
 import { toast as reactToast } from 'react-toastify';
+import { formatUnits } from 'viem';
+import { Medal } from 'lucide-react';
+import { useFetchBalance } from '@/hooks/useFetchBalance';
 const TIER_NAMES = {
-  0: 'None',
+  0: 'Gold',
   1: 'Silver',
-  2: 'Gold',
-  3: 'Platinum',
+  2: 'Platinum',
+  4: 'None',
 };
 
-const TIER_COLORS = {
-  0: 'bg-gray-800',
-  1: 'bg-gray-400',
-  2: 'bg-yellow',
-  3: 'bg-gray-200',
+const TIER_MEDAL = {
+  0: '/assets/gold-medal.svg',
+  1: '/assets/silver-medal.svg',
+  2: '/assets/bronze-medal.svg',
 };
 
 export default function Page() {
   const { address } = useAccount();
   const { getDaoInfo, contribute, getTierLimits } = useContribution();
   const { fetchTokenPrice } = useTokenPrice();
+  const { data: fetchedData, refreshData } = useFetchBalance(address);
 
   // Dynamic progress
   const [committed, setCommitted] = useState<number>(172);
@@ -53,7 +56,7 @@ export default function Page() {
     const amount = Number.parseFloat(inputValue);
 
     if (!isNaN(amount) && amount > 0) {
-      if (amount < 0.1) {
+      if (amount > 0.1) {
         reactToast.error('Amount should be lower than 0.1');
       }
       setCommitted((prev) => prev + amount);
@@ -99,6 +102,8 @@ export default function Page() {
   const totalRaisedPercentage = daoInfoData?.totalRaised
     ? (daoInfoData?.totalRaised / daoInfoData?.finalizeFundraisingGoal) * 100
     : 0;
+
+  console.log(daoInfoData?.whitelistInfo?.tier, 'hjkjhk');
 
   return (
     <PageLayout title="contribution" description="contribution">
@@ -176,14 +181,32 @@ export default function Page() {
                   <h3 className="text-sm font-bold">
                     Tier {TIER_NAMES[Number(daoInfoData?.whitelistInfo?.tier ?? 0) as keyof typeof TIER_NAMES]}
                   </h3>
-                  <div
-                    className={`w-6 h-6 rounded-full ${TIER_COLORS[Number(daoInfoData?.whitelistInfo?.tier ?? 0) as keyof typeof TIER_COLORS]}`}
-                  ></div>
+                  <div className="w-6 h-6 rounded-full">
+                    {/* Determine which set of images to use */}
+                    {fetchedData?.userTierLabel != null ? (
+                      <img
+                        // Choose the appropriate image set based on the userTierLabel
+                        src={
+                          fetchedData?.userTierLabel === 'Gold'
+                            ? '/assets/gold-medal.svg' // Show Gold image
+                            : fetchedData?.userTierLabel === 'Silver'
+                              ? '/assets/silver-medal.svg' // Show Silver image
+                              : fetchedData?.userTierLabel === 'Bronze'
+                                ? '/assets/bronze-medal.svg' // Show Bronze image
+                                : undefined // Default case if no tier matches
+                        }
+                        alt="Tier Icon"
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <div className="bg-gray-20 w-full h-full rounded-full" />
+                    )}
+                  </div>
                 </div>
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between">
                     <p className="text-gray-400 mb-1">Max</p>
-                    <p className="text-xl">{tierLimits}</p>
+                    <p className="text-xl">{formatUnits(BigInt(tierLimits), 18)}</p>
                   </div>
                   <div className="flex justify-between">
                     <p className="text-gray-400">Committed</p>

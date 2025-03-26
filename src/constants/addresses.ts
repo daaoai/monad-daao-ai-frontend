@@ -1,4 +1,4 @@
-export const daoAddress = '0x147f235Dde1adcB00Ef8E2D10D98fEd9a091284D';
+export const daoAddress = '0xC201EA874E80fDaf67EEDf6ffB957F84FbB61468';
 export const veloFactoryAddress = '0x04625B046C69577EfC40e6c0Bb83CDBAfab5a55F';
 export const nonFungiblePositionManagerAddress = '0x3dCc735C74F10FE2B9db2BB55C40fbBbf24490f7';
 export const quoterAddress = '0xE5bdDC76aD65fEF4396ead382c628e98794f3290';

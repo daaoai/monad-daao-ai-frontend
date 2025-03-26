@@ -7,14 +7,13 @@ import { modeTokenAddress } from '@/constants/addresses';
 import { useState } from 'react';
 import { Abi, formatUnits, Hex, parseUnits } from 'viem';
 import { handleViemTransactionError } from '@/utils/approval';
-import { useToast } from '../use-toast';
+import { toast as reactToast } from 'react-toastify';
 
 const useContribution = () => {
   const { address } = useAccount();
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
   const [approvalTxHash, setApprovalTxHash] = useState<Hex | undefined>(undefined);
-  const { toast } = useToast();
 
   const checkAllowance = async (requiredAmount: number | bigint): Promise<boolean> => {
     if (!address) return false;
@@ -57,10 +56,7 @@ const useContribution = () => {
         abi: CARTEL as Abi,
         error: err,
       });
-      toast({
-        title: errorMsg,
-        variant: 'destructive',
-      });
+      reactToast.error(errorMsg);
       return undefined;
     }
   };
@@ -120,33 +116,27 @@ const useContribution = () => {
         allowanceSufficient = true;
       }
       console.log({ allowanceSufficient });
+      console.log({ amountInWei });
       const txHash = await writeContractAsync({
         address: DAO_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'contribute',
         args: [amountInWei],
+        value: amountInWei,
       });
-
       const txnReceipt = await publicClient?.waitForTransactionReceipt({
         hash: txHash,
         confirmations: 1,
       });
       if (txnReceipt?.status !== 'success') {
-        toast({
-          title: 'Contribution failed',
-          variant: 'destructive',
-        });
+        reactToast.error('Contribution failed');
       }
-      toast({
-        title: 'Contribution successful',
-      });
+      reactToast.success('Your Contribution was Successfull');
+
       return txHash;
     } catch (err) {
       console.log({ err });
-      toast({
-        title: 'Contribution failed',
-        variant: 'destructive',
-      });
+      reactToast.error('Contribution failed');
       return undefined;
     }
   };
