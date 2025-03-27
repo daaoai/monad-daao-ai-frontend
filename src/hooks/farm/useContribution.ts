@@ -107,16 +107,38 @@ const useContribution = () => {
     }
   };
 
+  const checkWhitelist = async (): Promise<boolean> => {
+    if (!address) return false;
+    try {
+      const whitelistInfo = (await publicClient?.readContract({
+        address: DAO_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'getWhitelistInfo',
+        args: [address],
+      })) as [boolean, bigint, bigint];
+      
+      return whitelistInfo?.[0] ?? false;
+    } catch (err) {
+      console.error('Whitelist check error:', err);
+      return false;
+    }
+  };
+
   const contribute = async (amount: number) => {
     try {
-      const amountInWei = parseUnits(amount.toString(), 18);
-      let allowanceSufficient = await checkAllowance(amountInWei);
-      if (!allowanceSufficient) {
-        const approvalTx = await requestAllowance(amountInWei);
-        allowanceSufficient = true;
+      if (!address) {
+        reactToast.error('No wallet connected');
+        return undefined;
       }
-      console.log({ allowanceSufficient });
-      console.log({ amountInWei });
+      
+      const isWhitelisted = await checkWhitelist();
+      if (!isWhitelisted) {
+        reactToast.error('Address not whitelisted');
+        return undefined;
+      }
+
+      const amountInWei = parseUnits(amount.toString(), 18);
+      
       const txHash = await writeContractAsync({
         address: DAO_ADDRESS,
         abi: CONTRACT_ABI,
@@ -124,18 +146,71 @@ const useContribution = () => {
         args: [amountInWei],
         value: amountInWei,
       });
+      
       const txnReceipt = await publicClient?.waitForTransactionReceipt({
         hash: txHash,
         confirmations: 1,
       });
+      
       if (txnReceipt?.status !== 'success') {
         reactToast.error('Contribution failed');
+        return undefined;
       }
-      reactToast.success('Your Contribution was Successfull');
-
+      
+      reactToast.success('Your Contribution was Successful');
       return txHash;
     } catch (err) {
-      console.log({ err });
+      console.error('Contribution error:', err);
+      reactToast.error('Contribution failed');
+      return undefined;
+    }
+  };
+
+  const contributeWithToken = async (amount: number) => {
+    try {
+      if (!address) {
+        reactToast.error('No wallet connected');
+        return undefined;
+      }
+      
+      const isWhitelisted = await checkWhitelist();
+      if (!isWhitelisted) {
+        reactToast.error('Address not whitelisted');
+        return undefined;
+      }
+      
+      const amountInWei = parseUnits(amount.toString(), 18);
+      
+      let allowanceSufficient = await checkAllowance(amountInWei);
+      if (!allowanceSufficient) {
+        await requestAllowance(amountInWei);
+        allowanceSufficient = await checkAllowance(amountInWei);
+        if (!allowanceSufficient) {
+          throw new Error('Approval failed');
+        }
+      }
+      
+      const txHash = await writeContractAsync({
+        address: DAO_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'contributeWithToken',
+        args: [amountInWei],
+      });
+      
+      const txnReceipt = await publicClient?.waitForTransactionReceipt({
+        hash: txHash,
+        confirmations: 1,
+      });
+      
+      if (txnReceipt?.status !== 'success') {
+        reactToast.error('Contribution failed');
+        return undefined;
+      }
+      
+      reactToast.success('Your Contribution was Successful');
+      return txHash;
+    } catch (err) {
+      console.error('Token contribution error:', err);
       reactToast.error('Contribution failed');
       return undefined;
     }
@@ -156,7 +231,7 @@ const useContribution = () => {
     }
   };
 
-  return { getDaoInfo, contribute, getTierLimits };
+  return { getDaoInfo, contribute, getTierLimits, contributeWithToken, checkWhitelist };
 };
 
 export default useContribution;
