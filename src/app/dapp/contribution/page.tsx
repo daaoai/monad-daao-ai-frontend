@@ -256,24 +256,27 @@ export default function Page() {
                   </div>
                 </div>
               )}
-
-              <div className="flex w-full">
-                <Input
-                  type="text"
-                  placeholder="Enter the Amount"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  className="rounded-r-none text-black bg-white flex-1 h-10 text-lg"
-                  disabled={!address || !isWhitelisted || isLoading}
-                />
-                <Button
-                  onClick={handleContribute}
-                  className="rounded-l-none bg-[#C4F82A] text-black hover:bg-[#D5FF3A] h-10 px-8 text-lg font-medium"
-                  disabled={!address || !isWhitelisted || isLoading}
-                >
-                  {isLoading ? 'Processing...' : 'Contribute'}
-                </Button>
-              </div>
+              {fetchedData.goalReached ? (
+                <p>Funding goal is reached, waiting for finalization...</p>
+              ) : (
+                <div className="flex w-full">
+                  <Input
+                    type="text"
+                    placeholder="Enter the Amount"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    className="rounded-r-none text-black bg-white flex-1 h-10 text-lg"
+                    disabled={!address || !isWhitelisted || isLoading}
+                  />
+                  <Button
+                    onClick={handleContribute}
+                    className="rounded-l-none bg-[#C4F82A] text-black hover:bg-[#D5FF3A] h-10 px-8 text-lg font-medium"
+                    disabled={!address || !isWhitelisted || isLoading}
+                  >
+                    {isLoading ? 'Processing...' : 'Contribute'}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
