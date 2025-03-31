@@ -3,7 +3,7 @@ import { Abi, Hex, parseUnits, zeroAddress } from 'viem';
 import { useAccount, usePublicClient, useWriteContract } from 'wagmi';
 import { TICKETS } from '@/daao-sdk/abi/tickets';
 import { CARTEL } from '@/daao-sdk/abi/cartel';
-import { CARTEL_TOKEN_ADDRESS, TICKETS_CONTRACT_ADDRESS } from '@/constants/ticket';
+import { DAO_TOKEN_ADDRESS, TICKETS_CONTRACT_ADDRESS } from '@/constants/ticket';
 import { decodeEventLog } from 'viem';
 import { useToast } from './use-toast';
 import { handleViemTransactionError } from '@/utils/approval';
@@ -63,7 +63,7 @@ const useBuyTickets = () => {
     if (!address) return false;
     try {
       const allowance: unknown = await publicClient?.readContract({
-        address: CARTEL_TOKEN_ADDRESS,
+        address: DAO_TOKEN_ADDRESS,
         abi: CARTEL,
         functionName: 'allowance',
         args: [address, spender],
@@ -79,7 +79,7 @@ const useBuyTickets = () => {
     if (!address) return undefined;
     try {
       const tx = await writeContractAsync({
-        address: CARTEL_TOKEN_ADDRESS,
+        address: DAO_TOKEN_ADDRESS,
         abi: CARTEL,
         functionName: 'approve',
         args: [spender, amountToApprove],

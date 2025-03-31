@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 import { CURRENT_DAO_IMAGE } from '@/constants/links';
 import {
   daoAddress,
-  modeTokenAddress,
+  wmonTokenAddress,
   veloFactoryAddress,
   nonFungiblePositionManagerAddress,
   quoterAddress,
@@ -21,7 +21,7 @@ import { toast } from '@/hooks/use-toast';
 import { useAccount } from 'wagmi';
 import { ERC_20_ABI } from '@/daao-sdk/abi/erc20';
 import { VELO_POOL_ABI } from '@/daao-sdk/abi/veloPool';
-import { VELO_FACTORY_ABI } from '@/daao-sdk/abi/veloFactory';
+import { UNI_FACTORY_ABI } from '@/daao-sdk/abi/uniFactory';
 import { NON_FUNGIBLE_POSITION_MANAGER_ABI } from '@/daao-sdk/abi/nonFungiblePositionManager';
 import { QUOTER_ABI } from '@/daao-sdk/abi/quoterAbi';
 import { DAO } from '@/daao-sdk/abi/dao';
@@ -38,7 +38,7 @@ interface LiquidityProps {
 }
 
 const Liquidity: React.FC<LiquidityProps> = ({ onClose }) => {
-  const MODE_TOKEN_ADDRESS = modeTokenAddress;
+  const MODE_TOKEN_ADDRESS = wmonTokenAddress;
   const TICK_SPACING = tickSpacing;
   const DAO_TOKEN_ADDRESS = daoAddress || process.env.NEXT_PUBLIC_DAO_ADDRESS;
   const VELO_FACTORY_ADDRESS = veloFactoryAddress || process.env.NEXT_PUBLIC_VELO_FACTORY_ADDRESS;
@@ -545,7 +545,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ onClose }) => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const factoryContract = new ethers.Contract(
         VELO_FACTORY_ADDRESS!,
-        VELO_FACTORY_ABI,
+        UNI_FACTORY_ABI,
         // velodromeFactoryABI,
         provider,
       );

@@ -1,7 +1,7 @@
 export const SWAP_ROUTER_SIMULATE = [
   {
     inputs: [],
-    name: 'VELODROM_FACTORY',
+    name: 'UNISWAP_V3_FACTORY',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
@@ -11,11 +11,7 @@ export const SWAP_ROUTER_SIMULATE = [
       { internalType: 'address', name: 'pool', type: 'address' },
       { internalType: 'bool', name: 'zeroForOne', type: 'bool' },
       { internalType: 'uint256', name: 'amountIn', type: 'uint256' },
-      {
-        internalType: 'uint160',
-        name: 'sqrtPriceLimitX96',
-        type: 'uint160',
-      },
+      { internalType: 'uint160', name: 'sqrtPriceLimitX96', type: 'uint160' },
     ],
     name: 'quoteExactInputSingle',
     outputs: [{ internalType: 'uint256', name: 'amountOut', type: 'uint256' }],
@@ -27,11 +23,7 @@ export const SWAP_ROUTER_SIMULATE = [
       { internalType: 'address', name: 'pool', type: 'address' },
       { internalType: 'bool', name: 'zeroForOne', type: 'bool' },
       { internalType: 'uint256', name: 'amountOut', type: 'uint256' },
-      {
-        internalType: 'uint160',
-        name: 'sqrtPriceLimitX96',
-        type: 'uint160',
-      },
+      { internalType: 'uint160', name: 'sqrtPriceLimitX96', type: 'uint160' },
     ],
     name: 'quoteExactOutputSingle',
     outputs: [{ internalType: 'uint256', name: 'amountIn', type: 'uint256' }],
@@ -49,4 +41,4 @@ export const SWAP_ROUTER_SIMULATE = [
     stateMutability: 'view',
     type: 'function',
   },
-];
+] as const;

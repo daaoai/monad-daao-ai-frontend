@@ -7,7 +7,7 @@ import { Button } from '@/shadcn/components/ui/button';
 import { useAccount } from 'wagmi';
 import useContribution from '@/hooks/farm/useContribution';
 import useTokenPrice from '@/hooks/useTokenPrice';
-import { modeTokenAddress } from '@/constants/addresses';
+import { wmonTokenAddress } from '@/constants/addresses';
 import { toast as reactToast } from 'react-toastify';
 import { formatUnits } from 'viem';
 import { useFetchBalance } from '@/hooks/useFetchBalance';
@@ -99,7 +99,7 @@ export default function Page() {
 
   const fetchModePrice = async () => {
     try {
-      const modePrice = await fetchTokenPrice(modeTokenAddress as `0x${string}`);
+      const modePrice = await fetchTokenPrice(wmonTokenAddress as `0x${string}`);
       setModePrice(Number(modePrice));
     } catch (err) {
       console.log({ err });

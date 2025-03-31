@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { XCircle, Loader2 } from 'lucide-react'; // Import Loader2 icon
 import useDeposit from '@/hooks/farm/useDeposit';
 import { formatUnits, Hex, parseUnits } from 'viem';
-import { CARTEL_TOKEN_ADDRESS } from '@/constants/ticket';
+import { DAO_TOKEN_ADDRESS } from '@/constants/ticket';
 import useGetBalance from '@/hooks/useGetBalance';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/components/ui/card';
@@ -27,7 +27,7 @@ const DepositFarms: React.FC<DepositFarmsProps> = ({ onClose, poolAddress, fetch
     setDepositSuccess(null);
 
     const response = await deposit({
-      tokenAddress: CARTEL_TOKEN_ADDRESS,
+      tokenAddress: DAO_TOKEN_ADDRESS,
       poolAddress,
       amount: parseUnits(depositAmount.toString(), 18),
     });

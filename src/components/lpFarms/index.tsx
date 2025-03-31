@@ -8,8 +8,8 @@ import { shortenAddress } from '@/utils/address';
 import { Position } from '@/types/farm';
 // import useHarvest from '@/hooks/farm/useHarvest';
 import useLpFarms from '@/hooks/farm/uselpFarms';
-import { modeTokenAddress } from '@/constants/addresses';
-import { CARTEL_TOKEN_ADDRESS } from '@/constants/ticket';
+import { wmonTokenAddress } from '@/constants/addresses';
+import { DAO_TOKEN_ADDRESS } from '@/constants/ticket';
 import Image from 'next/image';
 import { formatUnits } from 'viem';
 import AnimatedSkeleton from '../animatedSkeleton';
@@ -269,7 +269,7 @@ const LPFarms: React.FC<LPFarmsProps> = ({ onClose, daoTokenAddress }) => {
                       <td className="px-4 py-3">{position.liquidityUsd}</td>
                       <td className="px-4 py-3">
                         {viewMode === 'unstaked'
-                          ? position.token0 === modeTokenAddress || position.token1 === CARTEL_TOKEN_ADDRESS
+                          ? position.token0 === wmonTokenAddress || position.token1 === DAO_TOKEN_ADDRESS
                             ? 'No'
                             : 'Yes'
                           : formatUnits(position.rewardInfo, 18)}

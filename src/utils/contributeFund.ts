@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { CONTRACT_ABI } from '../daao-sdk/abi/abi';
 import { ERC_20_ABI } from '../daao-sdk/abi/erc20';
-import { daoAddress, modeTokenAddress } from '@/constants/addresses';
+import { daoAddress, wmonTokenAddress } from '@/constants/addresses';
 
 let web3: Web3 | null = null;
 
@@ -55,7 +55,7 @@ export const handleContribute = async (amount: string) => {
       return 0;
     }
 
-    const tokenContract = new web3.eth.Contract(ERC_20_ABI as any, modeTokenAddress);
+    const tokenContract = new web3.eth.Contract(ERC_20_ABI as any, wmonTokenAddress);
 
     const currentAllowanceRaw = await tokenContract.methods.allowance(contributor, daoAddress).call();
     console.log('Current allowance raw:', Number(currentAllowanceRaw));
@@ -71,7 +71,7 @@ export const handleContribute = async (amount: string) => {
       });
       const approveTx = {
         from: contributor,
-        to: modeTokenAddress,
+        to: wmonTokenAddress,
         data: tokenContract.methods.approve(daoAddress, requiredApproval).encodeABI(),
         gas: String(gasEstimate),
         gasPrice: '800000',

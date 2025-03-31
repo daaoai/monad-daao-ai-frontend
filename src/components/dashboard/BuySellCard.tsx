@@ -1,32 +1,31 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
-import { ethers } from 'ethers';
-import ModeTokenLogo from '/public/assets/mode.png';
-import Image from 'next/image';
-import { useAccount, useReadContracts } from 'wagmi';
-import { toast } from 'react-toastify';
-import { useFetchBalance } from '../../hooks/useFetchBalance';
-import { useFundContext } from './FundContext';
-import TicketPurchase from '../ticket';
-import { ModalWrapper } from '../modalWrapper';
-import CollectedTickets from '../collectedTickets';
-import useGetUserTickets from '@/hooks/useGetUserTickets';
-import { MODE_ABI } from '@/daao-sdk/abi/mode';
-import { DAO_TOKEN_ABI } from '@/daao-sdk/abi/daoToken';
-import { VELO_POOL_ABI } from '@/daao-sdk/abi/veloPool';
-import { VELO_FACTORY_ABI } from '@/daao-sdk/abi/veloFactory';
-import { SWAP_ROUTER_SIMULATE } from '@/daao-sdk/abi/swapRouterSimulate';
+import { quoterAddress, swapRouterAddress, veloFactoryAddress, wmonTokenAddress } from '@/constants/addresses';
 import { CURRENT_DAO_IMAGE } from '@/constants/links';
+import { tickSpacing } from '@/constants/modeChain';
+import { DAO_TOKEN_ABI } from '@/daao-sdk/abi/daoToken';
+import { MODE_ABI } from '@/daao-sdk/abi/mode';
+import { POOL_ABI } from '@/daao-sdk/abi/pool';
 import { ROUTER_ABI } from '@/daao-sdk/abi/router';
+import { SWAP_ROUTER_SIMULATE } from '@/daao-sdk/abi/swapRouterSimulate';
+import { UNI_FACTORY_ABI } from '@/daao-sdk/abi/uniFactory';
+import useGetUserTickets from '@/hooks/useGetUserTickets';
+import { Button } from '@/shadcn/components/ui/button';
 import { Card, CardContent } from '@/shadcn/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/shadcn/components/ui/tabs';
-import { Button } from '@/shadcn/components/ui/button';
-import React from 'react';
-import { clPoolRouterAddress, modeTokenAddress, swapRouterAddress, veloFactoryAddress } from '@/constants/addresses';
-import { tickSpacing } from '@/constants/modeChain';
-import { Settings2 } from 'lucide-react';
-import SlippageModal from '../slippageModal';
+import { ethers } from 'ethers';
 import { motion } from 'framer-motion';
+import { Settings2 } from 'lucide-react';
+import Image from 'next/image';
+import React, { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { useAccount, useReadContracts } from 'wagmi';
+import { useFetchBalance } from '../../hooks/useFetchBalance';
+import CollectedTickets from '../collectedTickets';
+import { ModalWrapper } from '../modalWrapper';
+import SlippageModal from '../slippageModal';
+import TicketPurchase from '../ticket';
+import { useFundContext } from './FundContext';
+import ModeTokenLogo from '/public/assets/mode.png';
 
 const BuySellCard = () => {
   const account = useAccount();
@@ -86,9 +85,8 @@ const BuySellCard = () => {
 
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const factoryContract = new ethers.Contract(veloFactoryAddress, VELO_FACTORY_ABI, provider);
-        const pool = await factoryContract.callStatic.getPool(modeTokenAddress, daoTokenAddress, tickSpacing);
-        console.log('Pool:', pool);
+        const factoryContract = new ethers.Contract(veloFactoryAddress, UNI_FACTORY_ABI, provider);
+        const pool = await factoryContract.callStatic.getPool(wmonTokenAddress, daoTokenAddress, tickSpacing);
 
         if (pool && pool !== ethers.constants.AddressZero) {
           setPoolAddress(pool);
@@ -118,9 +116,15 @@ const BuySellCard = () => {
     if (!window.ethereum) return;
     try {
       // const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const poolContract = new ethers.Contract(poolAddress, VELO_POOL_ABI, provider);
-      // const [sqrtPriceX96] = await poolContract.slot0();
       setCurrentSqrtPrice(zeroForOne === true ? '4295128750' : '1461446703485210103287273052203988822378723970300');
+
+      // const poolContract = new ethers.Contract(poolAddress, POOL_ABI, provider);
+
+      // const slot0 = await poolContract.slot0();
+
+      // console.log('sqrtPriceX96:', slot0.sqrtPriceX96.toString());
+
+      // setCurrentSqrtPrice(slot0.sqrtPriceX96.toString());
     } catch (error) {
       console.error('Error fetching slot0:', error);
     }
@@ -131,12 +135,12 @@ const BuySellCard = () => {
     if (!window.ethereum) return;
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const poolContract = new ethers.Contract(poolAddress, VELO_POOL_ABI, provider);
+      const poolContract = new ethers.Contract(poolAddress, POOL_ABI, provider);
       const t0 = await poolContract.token0();
       const t1 = await poolContract.token1();
-      if (t0 === modeTokenAddress) {
+      if (t0 === wmonTokenAddress) {
         setFirstTokenMode(true);
-      } else if (t1 === modeTokenAddress) {
+      } else if (t1 === wmonTokenAddress) {
         setFirstTokenMode(false);
       }
     } catch (error) {
@@ -183,27 +187,19 @@ const BuySellCard = () => {
       }
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const clPoolRouter = new ethers.Contract(swapRouterAddress, SWAP_ROUTER_SIMULATE, signer);
+      const quoter = new ethers.Contract(quoterAddress, SWAP_ROUTER_SIMULATE, signer);
       const amountSpecified = ethers.utils.parseUnits(newFromValue, 18);
-      // const minOutput = 0;
+
+      if (!Number(amountSpecified)) {
+        return;
+      }
       if (!currentSqrtPrice) return;
-      // const sqrtPriceBN = ethers.BigNumber.from(currentSqrtPrice);
-      // let sqrtPriceLimitBN: ethers.BigNumber;
-      // const slippageBps = 1;
-      // if (zeroForOne) {
-      //   sqrtPriceLimitBN = sqrtPriceBN.mul(100 - slippageBps).div(100);
-      // } else {
-      //   sqrtPriceLimitBN = sqrtPriceBN.mul(100 + slippageBps).div(100);
-      // }
-      console.log('sqrtPriceLimitBN:', currentSqrtPrice);
-      console.log('zeroForOne:', zeroForOne);
-      const sqrtPriceLimitX96 = currentSqrtPrice;
-      // const deadline = Math.floor(Date.now() / 1000) + 5 * 60;
-      const amount1 = await clPoolRouter.callStatic.quoteExactInputSingle(
+
+      const amount1 = await quoter.callStatic.quoteExactInputSingle(
         poolAddress,
         zeroForOne,
-        amountSpecified,
-        sqrtPriceLimitX96,
+        amountSpecified.toString(),
+        zeroForOne === true ? '4295128750' : '1461446703485210103287273052203988822378723970300',
       );
 
       let outBnAbs = amount1;
@@ -237,10 +233,10 @@ const BuySellCard = () => {
 
     const requiredAmountBN = ethers.utils.parseUnits(amountFrom || '0', 18);
 
-    const currentAllowance: ethers.BigNumber = await daoTokenContract.allowance(userAddress, clPoolRouterAddress);
+    const currentAllowance: ethers.BigNumber = await daoTokenContract.allowance(userAddress, swapRouterAddress);
     if (currentAllowance.lt(requiredAmountBN)) {
       console.log('Approving DAO tokens...');
-      const approveTx = await daoTokenContract.approve(clPoolRouterAddress, requiredAmountBN);
+      const approveTx = await daoTokenContract.approve(swapRouterAddress, requiredAmountBN);
       await approveTx.wait();
       console.log('DAO token approval completed!');
     }
@@ -249,15 +245,15 @@ const BuySellCard = () => {
   async function checkAndApproveMODE(signer: ethers.Signer) {
     if (!daoTokenAddress) return;
     const userAddress = await signer.getAddress();
-    const ModeTokenContract = new ethers.Contract(modeTokenAddress, MODE_ABI, signer);
+    const ModeTokenContract = new ethers.Contract(wmonTokenAddress, MODE_ABI, signer);
 
     const requiredAmountBN = ethers.utils.parseUnits(amountFrom || '0', 18);
 
-    const currentAllowance: ethers.BigNumber = await ModeTokenContract.allowance(userAddress, clPoolRouterAddress);
+    const currentAllowance: ethers.BigNumber = await ModeTokenContract.allowance(userAddress, swapRouterAddress);
     console.log('Current allowance:', currentAllowance.toString());
     if (currentAllowance.lt(requiredAmountBN)) {
       console.log('Approving DAO tokens...');
-      const approveTx = await ModeTokenContract.approve(clPoolRouterAddress, requiredAmountBN);
+      const approveTx = await ModeTokenContract.approve(swapRouterAddress, requiredAmountBN);
       await approveTx.wait();
       console.log('DAO token approval completed!');
     }
@@ -292,7 +288,7 @@ const BuySellCard = () => {
       } else if (activeTab === 'buy') {
         await checkAndApproveMODE(signer);
       }
-      const clPoolRouter = new ethers.Contract(clPoolRouterAddress, ROUTER_ABI, signer);
+      const clPoolRouter = new ethers.Contract(swapRouterAddress, ROUTER_ABI, signer);
       const amountSpecified = ethers.utils.parseUnits(amountFrom || '0', 'ether');
       console.log('amountSpecified:', amountSpecified.toString());
 
@@ -309,18 +305,7 @@ const BuySellCard = () => {
       if (!currentSqrtPrice) {
         throw new Error('No currentSqrtPrice found. Please ensure slot0 is loaded.');
       }
-
-      // const sqrtPriceBN = ethers.BigNumber.from(currentSqrtPrice);
-      // let sqrtPriceLimitBN: ethers.BigNumber;
-      // const slippageBps = 1;
-
-      // if (zeroForOne) {
-      //   sqrtPriceLimitBN = sqrtPriceBN.mul(100 - slippageBps).div(100);
-      // } else {
-      //   sqrtPriceLimitBN = sqrtPriceBN.mul(100 + slippageBps).div(100);
-      // }
-      //4295128750
-      const sqrtPriceLimitX96 = currentSqrtPrice;
+      const sqrtPriceLimitX96 = zeroForOne ? '4295128750' : '1461446703485210103287273052203988822378723970300';
 
       const tx = await clPoolRouter.getSwapResult(
         poolAddress,
@@ -343,14 +328,14 @@ const BuySellCard = () => {
       console.error('Error during swap:', error);
     } finally {
       if (activeTab === 'buy') {
-        // Spent MODE
+        // Spent PAYMENT TOKEN
         setModeBalance((prev) => (Number(prev) - Number(amountFrom)).toString());
         // Gained DAO
         setDaoBalance((prev) => (Number(prev) + Number(amountTo)).toString());
       } else {
         // Spent DAO
         setDaoBalance((prev) => (Number(prev) - Number(amountFrom)).toString());
-        // Gained MODE
+        // Gained PAYMENT TOKEN
         setModeBalance((prev) => (Number(prev) + Number(amountTo)).toString());
       }
       refetch();
@@ -360,8 +345,8 @@ const BuySellCard = () => {
       setAmountTo(0);
     }
   }
-  const fromLabel = activeTab === 'buy' ? 'MODE' : 'CARTEL';
-  const toLabel = activeTab === 'buy' ? 'CARTEL' : 'MODE';
+  const fromLabel = activeTab === 'buy' ? 'PAYMENT TOKEN' : 'DAO TOKEN';
+  const toLabel = activeTab === 'buy' ? 'DAO TOKEN' : 'PAYMENT TOKEN';
   const [isBurnTicketModalOpen, setIsBurnTicketModalOpen] = useState(false);
   const [isCollectedTicketModalOpen, setIsCollectedTicketModalOpen] = useState(false);
   const openBurnTicketModal = useCallback(() => setIsBurnTicketModalOpen(true), []);
@@ -427,25 +412,25 @@ const BuySellCard = () => {
             onClick={() => setAmountFrom('1000')}
             className="bg-gray-40 rounded-md p-2 text-sm active:scale-95 transition-transform ease-in-out duration-150"
           >
-            1000 MODE
+            1000 PAYMENT TOKEN
           </button>
           <button
             onClick={() => setAmountFrom('10000')}
             className="bg-gray-40 rounded-md p-2 text-sm active:scale-95 transition-transform ease-in-out duration-150"
           >
-            10000 MODE
+            10000 PAYMENT TOKEN
           </button>
           <button
             onClick={() => setAmountFrom('50000')}
             className="bg-gray-40 rounded-md p-2 text-sm active:scale-95 transition-transform ease-in-out duration-150"
           >
-            50000 MODE
+            50000 PAYMENT TOKEN
           </button>
           <button
             onClick={() => setAmountFrom('100000')}
             className="bg-gray-40 rounded-md p-2 text-sm active:scale-95 transition-transform ease-in-out duration-150"
           >
-            100000 MODE
+            100000 PAYMENT TOKEN
           </button>
         </div> */}
 
@@ -480,7 +465,7 @@ const BuySellCard = () => {
               <Button variant="outline" className="bg-transparent border-[#242626] hover:bg-[#242626] hover:text-white">
                 <Image
                   src={activeTab === 'buy' ? ModeTokenLogo : CURRENT_DAO_IMAGE}
-                  alt={activeTab === 'buy' ? 'MODE Token' : 'DAO Token'}
+                  alt={activeTab === 'buy' ? 'PAYMENT TOKEN Token' : 'DAO Token'}
                   width={16}
                   height={16}
                   className="mr-2"
@@ -508,7 +493,7 @@ const BuySellCard = () => {
               <Button variant="outline" className="bg-transparent border-[#242626] hover:bg-[#242626] hover:text-white">
                 <Image
                   src={activeTab === 'buy' ? CURRENT_DAO_IMAGE : ModeTokenLogo}
-                  alt={activeTab === 'buy' ? 'DAO Token' : 'MODE Token'}
+                  alt={activeTab === 'buy' ? 'DAO Token' : 'PAYMENT TOKEN Token'}
                   width={16}
                   height={16}
                   className="mr-2"

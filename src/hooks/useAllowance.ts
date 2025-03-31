@@ -1,5 +1,5 @@
 import { CARTEL } from '@/daao-sdk/abi/cartel';
-import { CARTEL_TOKEN_ADDRESS } from '@/constants/ticket';
+import { DAO_TOKEN_ADDRESS } from '@/constants/ticket';
 import { handleViemTransactionError } from '@/utils/approval';
 import { Abi, Hex } from 'viem';
 import { useAccount, usePublicClient, useWriteContract } from 'wagmi';
@@ -14,7 +14,7 @@ const useAllowance = () => {
     if (!address) return false;
     try {
       const allowance: unknown = await publicClient?.readContract({
-        address: CARTEL_TOKEN_ADDRESS,
+        address: DAO_TOKEN_ADDRESS,
         abi: CARTEL,
         functionName: 'allowance',
         args: [address, spender],
@@ -24,7 +24,7 @@ const useAllowance = () => {
         requiredAmount,
         address,
         spender,
-        CARTEL_TOKEN_ADDRESS,
+        CARTEL_TOKEN_ADDRESS: DAO_TOKEN_ADDRESS,
       });
       return BigInt(allowance as bigint) >= BigInt(requiredAmount);
     } catch (err) {
@@ -37,7 +37,7 @@ const useAllowance = () => {
     if (!address) return undefined;
     try {
       const tx = await writeContractAsync({
-        address: CARTEL_TOKEN_ADDRESS,
+        address: DAO_TOKEN_ADDRESS,
         abi: CARTEL,
         functionName: 'approve',
         args: [spender, amountToApprove],

@@ -4,10 +4,10 @@ import { useReadContracts } from 'wagmi';
 import { ethers } from 'ethers';
 import { CONTRACT_ABI } from '@/daao-sdk/abi/abi';
 import { MODE_ABI } from '@/daao-sdk/abi/mode';
-import { daoAddress, modeTokenAddress } from '@/constants/addresses';
+import { daoAddress, wmonTokenAddress } from '@/constants/addresses';
 
 const wagmiModeContract = {
-  address: modeTokenAddress,
+  address: wmonTokenAddress,
   abi: MODE_ABI,
 } as const;
 

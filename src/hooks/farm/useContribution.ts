@@ -3,7 +3,7 @@ import { useAccount, useWriteContract } from 'wagmi';
 import { CARTEL } from '@/daao-sdk/abi/cartel';
 import { CONTRACT_ABI } from '@/daao-sdk/abi/abi';
 import { usePublicClient } from 'wagmi';
-import { modeTokenAddress } from '@/constants/addresses';
+import { wmonTokenAddress } from '@/constants/addresses';
 import { useState } from 'react';
 import { Abi, formatUnits, Hex, parseUnits } from 'viem';
 import { handleViemTransactionError } from '@/utils/approval';
@@ -19,7 +19,7 @@ const useContribution = () => {
     if (!address) return false;
     try {
       const allowance: unknown = await publicClient?.readContract({
-        address: modeTokenAddress,
+        address: wmonTokenAddress,
         abi: CARTEL,
         functionName: 'allowance',
         args: [address, DAO_ADDRESS],
@@ -35,7 +35,7 @@ const useContribution = () => {
     if (!address) return undefined;
     try {
       const tx = await writeContractAsync({
-        address: modeTokenAddress,
+        address: wmonTokenAddress,
         abi: CARTEL,
         functionName: 'approve',
         args: [DAO_ADDRESS, amountToApprove],
