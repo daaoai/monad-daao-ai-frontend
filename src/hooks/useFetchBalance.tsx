@@ -23,7 +23,6 @@ export const useFetchBalance = (accountAddress: `0x${string}` | undefined) => {
   const [data, setData] = useState({
     balance: '0',
     tierNumber: 0,
-
     isWhitelisted: false,
     maxLimit: 0,
     contributedAmountYet: 0,
@@ -96,9 +95,14 @@ export const useFetchBalance = (accountAddress: `0x${string}` | undefined) => {
         functionName: 'contributions',
         args: accountAddress ? [accountAddress] : [],
       },
+      // payment token adrres
+      {
+        ...wagmiDaoContract,
+        functionName: 'PAYMENT_TOKEN',
+      },
     ],
   });
-  console.log('data is', data);
+  console.log('data is', contractData);
   const { data: tierLimitData, refetch: refetchTierLimit } = useReadContracts({
     contracts: [
       {
@@ -163,6 +167,6 @@ export const useFetchBalance = (accountAddress: `0x${string}` | undefined) => {
     await refetch();
     await refetchTierLimit();
   };
-
+  console.log({ Pk: data });
   return { data, refreshData };
 };
