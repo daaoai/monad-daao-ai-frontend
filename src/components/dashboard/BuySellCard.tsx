@@ -345,8 +345,8 @@ const BuySellCard = () => {
       setAmountTo(0);
     }
   }
-  const fromLabel = activeTab === 'buy' ? 'PAYMENT TOKEN' : 'DAO TOKEN';
-  const toLabel = activeTab === 'buy' ? 'DAO TOKEN' : 'PAYMENT TOKEN';
+  const fromLabel = activeTab === 'buy' ? 'WMON' : 'ScrollDao';
+  const toLabel = activeTab === 'buy' ? 'ScrollDao' : 'WMON';
   const [isBurnTicketModalOpen, setIsBurnTicketModalOpen] = useState(false);
   const [isCollectedTicketModalOpen, setIsCollectedTicketModalOpen] = useState(false);
   const openBurnTicketModal = useCallback(() => setIsBurnTicketModalOpen(true), []);
