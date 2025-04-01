@@ -12,7 +12,7 @@ import useGetUserTickets from '@/hooks/useGetUserTickets';
 import { Button } from '@/shadcn/components/ui/button';
 import { Card, CardContent } from '@/shadcn/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/shadcn/components/ui/tabs';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { motion } from 'framer-motion';
 import { Settings2 } from 'lucide-react';
 import Image from 'next/image';
@@ -26,12 +26,13 @@ import SlippageModal from '../slippageModal';
 import TicketPurchase from '../ticket';
 import { useFundContext } from './FundContext';
 import ModeTokenLogo from '/public/assets/mode.png';
+import Decimal from 'decimal.js';
 
 const BuySellCard = () => {
   const account = useAccount();
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
   const [amountFrom, setAmountFrom] = useState('');
-  const [amountTo, setAmountTo] = useState(0);
+  const [amountTo, setAmountTo] = useState('0');
   const [firstTokenMode, setFirstTokenMode] = useState(false);
   const [currentSqrtPrice, setCurrentSqrtPrice] = useState<string>('');
   const [slippageOpen, setSlippageOpen] = useState(false);
@@ -108,7 +109,7 @@ const BuySellCard = () => {
     fetchSlot0();
     fetchBalances();
     setAmountFrom('');
-    setAmountTo(0);
+    setAmountTo('0');
   }, [activeTab, poolAddress]);
 
   async function fetchSlot0() {
@@ -116,7 +117,7 @@ const BuySellCard = () => {
     if (!window.ethereum) return;
     try {
       // const provider = new ethers.providers.Web3Provider(window.ethereum);
-      setCurrentSqrtPrice(zeroForOne === true ? '4295128750' : '1461446703485210103287273052203988822378723970300');
+      setCurrentSqrtPrice(zeroForOne ? '4295128750' : '1461446703485210103287273052203988822378723970300');
 
       // const poolContract = new ethers.Contract(poolAddress, POOL_ABI, provider);
 
@@ -174,14 +175,14 @@ const BuySellCard = () => {
       if (activeTab === 'buy') {
         if (Number(modeBalance) < Number(newFromValue)) {
           toast.error('Insufficient balance');
-          setAmountTo(0);
+          setAmountTo('0');
           return;
         }
       }
       if (activeTab === 'sell') {
         if (Number(daoBalance) < Number(newFromValue)) {
           toast.error('Insufficient balance');
-          setAmountTo(0);
+          setAmountTo('0');
           return;
         }
       }
@@ -199,7 +200,7 @@ const BuySellCard = () => {
         poolAddress,
         zeroForOne,
         amountSpecified.toString(),
-        zeroForOne === true ? '4295128750' : '1461446703485210103287273052203988822378723970300',
+        zeroForOne ? '4295128750' : '1461446703485210103287273052203988822378723970300',
       );
 
       let outBnAbs = amount1;
@@ -209,10 +210,10 @@ const BuySellCard = () => {
       const outTokens = ethers.utils.formatUnits(outBnAbs, 18);
 
       console.log('Simulated swap output:', outTokens);
-      setAmountTo(parseFloat(outTokens));
+      setAmountTo(outTokens);
     } catch (err) {
       console.error('Error simulating swap:', err);
-      setAmountTo(0);
+      setAmountTo('0');
     }
   }
 
@@ -220,7 +221,7 @@ const BuySellCard = () => {
     const val = e.target.value;
     setAmountFrom(val);
     if (!val) {
-      setAmountTo(0);
+      setAmountTo('0');
       return;
     }
     simulateSwap(val);
@@ -295,9 +296,9 @@ const BuySellCard = () => {
       const slipDecimal = parseFloat(slippageTolerance) / 100;
       console.log('Slippage decimal:', slipDecimal);
       const quotedOut = amountTo;
-      const minOutputNumber = quotedOut * (1 - slipDecimal);
-      console.log('minOutputNumber:', minOutputNumber);
-      const minOutputBN = ethers.utils.parseUnits(minOutputNumber.toFixed(6), 18);
+      const minOutput = new Decimal(quotedOut).mul(1 - slipDecimal).toFixed(18);
+
+      const minOutputBN = ethers.utils.parseUnits(minOutput, 18);
       console.log('minOutput:', minOutputBN);
 
       const deadline = Math.floor(Date.now() / 1000) + 60 * 5;
@@ -321,7 +322,7 @@ const BuySellCard = () => {
 
       await fetchSlot0();
       setAmountFrom('');
-      setAmountTo(0);
+      setAmountTo('0');
       console.log('Swap successful!', receipt);
       toast.success('Swap/Buy successful');
     } catch (error) {
@@ -342,7 +343,7 @@ const BuySellCard = () => {
       refreshData();
       setIsSwapping(false);
       setAmountFrom('');
-      setAmountTo(0);
+      setAmountTo('0');
     }
   }
   const fromLabel = activeTab === 'buy' ? 'WMON' : 'ScrollDao';
@@ -484,7 +485,7 @@ const BuySellCard = () => {
                 type="number"
                 placeholder="0"
                 value={amountTo}
-                onChange={(e) => setAmountTo(Number(e.target.value))}
+                onChange={(e) => setAmountTo(e.target.value)}
                 className={`appearance-none w-full bg-transparent p-0 text-3xl [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-0 outline-none`}
               />
             </div>
