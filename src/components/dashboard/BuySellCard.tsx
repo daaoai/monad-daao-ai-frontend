@@ -4,10 +4,10 @@ import { CURRENT_DAO_IMAGE } from '@/constants/links';
 import { tickSpacing } from '@/constants/modeChain';
 import { DAO_TOKEN_ABI } from '@/daao-sdk/abi/daoToken';
 import { MODE_ABI } from '@/daao-sdk/abi/mode';
-import { POOL_ABI } from '@/daao-sdk/abi/pool';
 import { ROUTER_ABI } from '@/daao-sdk/abi/router';
 import { SWAP_ROUTER_SIMULATE } from '@/daao-sdk/abi/swapRouterSimulate';
 import { UNI_FACTORY_ABI } from '@/daao-sdk/abi/uniFactory';
+import { UNI_POOL_ABI } from '@/daao-sdk/abi/uniPool';
 import useGetUserTickets from '@/hooks/useGetUserTickets';
 import { Button } from '@/shadcn/components/ui/button';
 import { Card, CardContent } from '@/shadcn/components/ui/card';
@@ -135,7 +135,7 @@ const BuySellCard = () => {
     if (!window.ethereum) return;
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const poolContract = new ethers.Contract(poolAddress, POOL_ABI, provider);
+      const poolContract = new ethers.Contract(poolAddress, UNI_POOL_ABI, provider);
       const t0 = await poolContract.token0();
       const t1 = await poolContract.token1();
       if (t0 === wmonTokenAddress) {
@@ -464,8 +464,8 @@ const BuySellCard = () => {
               </div>
               <Button variant="outline" className="bg-transparent border-[#242626] hover:bg-[#242626] hover:text-white">
                 <Image
-                  src={activeTab === 'buy' ? ModeTokenLogo : CURRENT_DAO_IMAGE}
-                  alt={activeTab === 'buy' ? 'PAYMENT TOKEN Token' : 'DAO Token'}
+                  src={activeTab === 'buy' ? '' : CURRENT_DAO_IMAGE}
+                  alt={activeTab === 'buy' ? 'PT' : 'DAO Token'}
                   width={16}
                   height={16}
                   className="mr-2"
