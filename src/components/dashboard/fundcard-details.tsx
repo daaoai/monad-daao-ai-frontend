@@ -147,7 +147,7 @@ const FundDetails: React.FC<FundDetailsProps> = (props) => {
             ${props.shortname} {props.longname}
           </CardTitle>
         </div> */}
-      <div className="border-2 border-gray-30 rounded-md my-4 p-6 flex items-center gap-6">
+      {/* <div className="border-2 border-gray-30 rounded-md my-4 p-6 flex items-center gap-6">
         <button
           className="bg-teal-50 text-black text-sm rounded-md p-2 hover:bg-teal-60 active:scale-95 transition-transform ease-in-out duration-150"
           onClick={openLiquidityModalOpen}
@@ -166,8 +166,8 @@ const FundDetails: React.FC<FundDetailsProps> = (props) => {
         </ModalWrapper>
         <ModalWrapper isOpen={isLPFarmModalOpen} onClose={closeFarmModalOpen}>
           <LPFarms onClose={closeFarmModalOpen} daoTokenAddress={daoTokenAddress} />
-        </ModalWrapper>
-        {/* 
+        </ModalWrapper> */}
+      {/* 
           <div className="flex flex-col gap-2">
             <p className="text-gray-70 font-rubik text-sm font-normal">LP VALUE</p>
             <p>12</p>
@@ -181,7 +181,7 @@ const FundDetails: React.FC<FundDetailsProps> = (props) => {
             <p>12</p>
           </div>
          */}
-      </div>
+      {/* </div> */}
       <div className="flex justify-between w-full mb-4">
         <div className="w-fit flex gap-x-2 items-center">
           <h5 className="text-sm sm:text-base lg:text-lg text-[#D0F0BF]">$Sorcerer</h5>
