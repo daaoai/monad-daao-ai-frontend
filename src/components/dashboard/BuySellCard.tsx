@@ -448,9 +448,9 @@ const BuySellCard = () => {
             </div>
             <div className="space-y-2 text-right">
               <div className="text-sm flex flex-row justify-between">
-                <span className="text-[#aeb3b6]">
+                {/* <span className="text-[#aeb3b6]">
                   Balance: {activeTab === 'buy' ? Number(modeBalance).toFixed(3) : Number(daoBalance).toFixed(3)}
-                </span>
+                </span> */}
                 {/* <Button
                   variant="link"
                   className="text-[#39db83] p-0 h-auto font-normal"
@@ -464,7 +464,7 @@ const BuySellCard = () => {
               </div>
               <Button variant="outline" className="bg-transparent border-[#242626] hover:bg-[#242626] hover:text-white">
                 <Image
-                  src={activeTab === 'buy' ? '' : CURRENT_DAO_IMAGE}
+                  src={activeTab === 'buy' ? CURRENT_DAO_IMAGE : CURRENT_DAO_IMAGE}
                   alt={activeTab === 'buy' ? 'PT' : 'DAO Token'}
                   width={16}
                   height={16}
