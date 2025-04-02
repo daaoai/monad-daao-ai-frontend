@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { CONTRACT_ABI } from '../daao-sdk/abi/abi';
+import { DAO_CONTRACT_ABI } from '../daao-sdk/abi/abi';
 import { daoAddress } from '@/constants/addresses';
 
 const TIER_LABELS = ['None', 'Platinum', 'Gold', 'Silver'];
@@ -14,7 +14,7 @@ export const getContractData = async () => {
   console.log('Signer object created:', signer);
   const userAddress = await signer.getAddress();
 
-  const contract = new ethers.Contract(daoAddress, CONTRACT_ABI, provider);
+  const contract = new ethers.Contract(daoAddress, DAO_CONTRACT_ABI, provider);
   console.log('Contract object created:', contract);
 
   //   const start = await contract.getStartDate();

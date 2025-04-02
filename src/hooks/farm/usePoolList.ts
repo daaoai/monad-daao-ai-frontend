@@ -10,7 +10,7 @@ import { CARTEL } from '@/daao-sdk/abi/cartel';
 const usePoolList = () => {
   const { address } = useAccount();
   const publicClient = usePublicClient();
-  const { fetchTokenPrice, fetchTokenPriceGeko } = useTokenPrice();
+  const { fetchTokenPriceDexScreener, fetchTokenPriceCoingecko } = useTokenPrice();
   const getTotalPoolLength = async () => {
     try {
       const response = await publicClient?.readContract({
@@ -78,8 +78,8 @@ const usePoolList = () => {
       ];
 
       if (results) {
-        const rewardTokenPrice = await fetchTokenPriceGeko(results[2][0]); // GAMBL TOKEN
-        const depositTokenPrice = await fetchTokenPrice(results[4]);
+        const rewardTokenPrice = await fetchTokenPriceCoingecko(results[2][0]); // GAMBL TOKEN
+        const depositTokenPrice = await fetchTokenPriceDexScreener(results[4]);
         const decimals = await publicClient?.multicall({
           contracts: [results[2][0], results[4]].map((address, index) => ({
             abi: CARTEL,

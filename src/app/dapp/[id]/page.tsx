@@ -1,21 +1,17 @@
 'use client';
-import { PageLayout } from '@/components/page-layout';
-import React, { useState, useEffect } from 'react';
-import FundDetails from '@/components/dashboard/fundcard-details';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
-import Orderbook from '@/components/dashboard/orderbook';
-import { useAccount } from 'wagmi';
-import { AssetTable } from '@/components/table/assets-table';
-import { assetColumns } from '@/components/table/assets-columns';
-import axios from 'axios';
-import useTokenPrice from '@/hooks/useTokenPrice';
-import type { Asset } from '@/types/dashboard';
 import BuySellCard from '@/components/dashboard/BuySellCard';
-import type { FundDetailsProps } from '@/types';
+import FundDetails from '@/components/dashboard/fundcard-details';
 import { useFundContext } from '@/components/dashboard/FundContext';
-import { useFetchBalance } from '@/hooks/useFetchBalance';
+import { PageLayout } from '@/components/page-layout';
 import { CURRENT_DAO_IMAGE } from '@/constants/links';
-import { motion } from 'framer-motion';
+import { useFetchBalance } from '@/hooks/useFetchBalance';
+import useTokenPrice from '@/hooks/useTokenPrice';
+import type { FundDetailsProps } from '@/types';
+import type { Asset } from '@/types/dashboard';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { Hex } from 'viem';
+import { useAccount } from 'wagmi';
 
 export interface Token {
   address: string;
@@ -109,12 +105,10 @@ const formatDaoHoldingTokens = (daoTokens: EnhancedApiResponse): Asset[] => {
 };
 
 const Dashboard: React.FC = () => {
-  const account = useAccount();
-  const accountAddress = account.address as `0x${string}`;
-  const { data: fetchedData, refreshData } = useFetchBalance(accountAddress);
+  const { data: fetchedData, refreshData } = useFetchBalance();
   const [daoTokenAddress, setDaoTokenAddress] = useState('');
   const [daaoHoldingTokens, setDaoHoldingTokens] = useState<ApiResponse | null>(null);
-  const { fetchTokenPriceGeko } = useTokenPrice();
+  const { fetchTokenPriceDexScreener } = useTokenPrice();
 
   const { daoBalance, priceUsd } = useFundContext();
   useEffect(() => {
@@ -149,7 +143,7 @@ const Dashboard: React.FC = () => {
           try {
             let priceUsd = '0';
             if (tokenBalance.token.address.toLowerCase() === '0x6bb4a37643e7613e812a8d1af5e675cc735ea1e2') {
-              const gambleTokenPrice = await fetchTokenPriceGeko('0x6bb4a37643e7613e812a8d1af5e675cc735ea1e2');
+              const gambleTokenPrice = await fetchTokenPriceDexScreener('0x6bb4a37643e7613e812a8d1af5e675cc735ea1e2');
               priceUsd = Number(gambleTokenPrice).toFixed(6);
               console.log(priceUsd, 'gambletokenPrice');
             } else {

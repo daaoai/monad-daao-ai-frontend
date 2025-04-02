@@ -3,7 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAccount, useReadContracts } from 'wagmi';
 // import { useFetchBalance } from "./fetchBalance"
 import { useFundContext } from './FundContext';
-import { CONTRACT_ABI } from '@/daao-sdk/abi/abi';
+import { DAO_CONTRACT_ABI } from '@/daao-sdk/abi/abi';
 import { Card, CardContent, CardHeader } from '@/shadcn/components/ui/card';
 import { Input } from '@/shadcn/components/ui/input';
 import { Button } from '@/shadcn/components/ui/button';
@@ -15,7 +15,7 @@ import { daoAddress } from '@/constants/addresses';
 
 const wagmiDaoContract = {
   address: daoAddress,
-  abi: CONTRACT_ABI,
+  abi: DAO_CONTRACT_ABI,
 } as const;
 export default function BurnCard(props: UpcomingFundDetailsProps) {
   const { toast } = useToast();

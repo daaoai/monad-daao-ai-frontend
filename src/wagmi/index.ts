@@ -1,7 +1,5 @@
 'use client';
 import { POLLING_INTERVAL } from '@/constants/wagmi';
-import { cookieStorage, createConfig, createStorage, http } from 'wagmi';
-import { goerli, sepolia, berachain, monadTestnet } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
   frontierWallet,
@@ -12,6 +10,8 @@ import {
   trustWallet,
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
+import { cookieStorage, createConfig, createStorage, http } from 'wagmi';
+import { berachain, bsc, monadTestnet } from 'wagmi/chains';
 
 const connectors = connectorsForWallets(
   [
@@ -28,7 +28,7 @@ const connectors = connectorsForWallets(
       ],
     },
   ],
-  { appName: 'Daao.ai', projectId: '762399822f3c6326e60b27c2c2085d52' || '' },
+  { appName: 'Daao.ai', projectId: '762399822f3c6326e60b27c2c2085d52' },
 );
 
 export const getWagmiConfig = () => {
@@ -38,6 +38,7 @@ export const getWagmiConfig = () => {
       //  goerli, sepolia,
       berachain,
       monadTestnet,
+      bsc,
     ],
     storage: createStorage({
       storage: cookieStorage,
@@ -50,6 +51,7 @@ export const getWagmiConfig = () => {
       // [sepolia.id]: http(),
       [monadTestnet.id]: http(),
       [berachain.id]: http(),
+      [bsc.id]: http(),
     },
     ssr: true,
     connectors,

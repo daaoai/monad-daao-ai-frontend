@@ -1,80 +1,68 @@
 'use client';
-import { PageLayout } from '@/components/page-layout';
-import { NextPage } from 'next/types';
-import React, { useEffect, useState } from 'react';
-import { Typography } from '@/components/typography';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
-import { CURRENT_DAO_IMAGE, DefaiCartelLinks, FUND_CARD_PLACEHOLDER_IMAGE, WHITEPAPER_URL } from '@/constants/links';
-import { Link as UILink } from 'lucide-react';
-import { FooterIconLink } from '@/components/footer';
-import CheckWaitlistModal from '@/components/landing/waitlist-modal';
-import { ethers } from 'ethers';
-import { CONTRACT_ABI } from '@/daao-sdk/abi/abi';
-import { Button } from '@/shadcn/components/ui/button';
-import { Card, CardContent } from '@/shadcn/components/ui/card';
-import { formatNumber } from '@/utils/numbers';
-import { daoAddress } from '@/constants/addresses';
-import { FundSection } from '@/components/dashboard/fundsection';
-import type { Fund } from '@/types/fund';
-import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
 import { ConnectWalletButton } from '@/components/connect-button';
-import PoolDetailCard from '@/components/poolDetailCard';
+import { FundSection } from '@/components/dashboard/fundsection';
 import FAQDaao from '@/components/faqDaao';
-import { useFetchBalance } from '@/hooks/useFetchBalance';
+import { PageLayout } from '@/components/page-layout';
+import PoolDetailCard from '@/components/poolDetailCard';
+import { FUND_CARD_PLACEHOLDER_IMAGE } from '@/constants/links';
+import { useToast } from '@/hooks/use-toast';
+import type { Fund } from '@/types/fund';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { NextPage } from 'next/types';
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
 
 const HomePage: NextPage = () => {
   const [price, setPrice] = useState<number | null>(0);
-  const [marketCap, setMarketCap] = useState<number | null>(null);
-  const [liquidity, setLiquidity] = useState<number | null>(null);
-  const [volume, setVolume] = useState<number | null>(null);
+  // const [marketCap, setMarketCap] = useState<number | null>(null);
+  // const [liquidity, setLiquidity] = useState<number | null>(null);
+  // const [volume, setVolume] = useState<number | null>(null);
   const { isConnected, address } = useAccount();
   const router = useRouter();
   const { toast } = useToast();
-  const { data: fetchedData, refreshData } = useFetchBalance(address);
-  console.log({ fetchedData: fetchedData.finalisedFundraising });
-  const isFinalised = fetchedData.finalisedFundraising;
-  useEffect(() => {
-    const modeRpc = 'https://testnet-rpc.monad.xyz';
-    const fetchMarketData = async () => {
-      const provider = new ethers.providers.JsonRpcProvider(modeRpc);
+  // const { data: fetchedData, refreshData } = useFetchBalance(address);
+  // console.log({ fetchedData: fetchedData.finalisedFundraising });
+  // const isFinalised = fetchedData.finalisedFundraising;
+  // useEffect(() => {
+  //   const modeRpc = 'https://testnet-rpc.monad.xyz';
+  //   const fetchMarketData = async () => {
+  //     const provider = new ethers.providers.JsonRpcProvider(modeRpc);
 
-      // const signer = provider.getSigner();
+  //     // const signer = provider.getSigner();
 
-      const contract = new ethers.Contract(daoAddress as string, CONTRACT_ABI, provider);
-      const daoToken = await contract.daoToken();
-      // setDaoTokenAddress(daoToken)
-      // if (!daoTokenAddress) return
+  //     const contract = new ethers.Contract(daoAddress as string, CONTRACT_ABI, provider);
+  //     const daoToken = await contract.daoToken();
+  //     // setDaoTokenAddress(daoToken)
+  //     // if (!daoTokenAddress) return
 
-      // const url = `https://api.dexscreener.com/token-pairs/v1/mode/${daoTokenAddress}`
-      const url = `https://api.dexscreener.com/token-pairs/v1/mode/${daoToken}`;
-      console.log('url is ', url);
-      try {
-        // Replace with your actual endpoint or logic
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log('Data from api is  is ', data);
+  //     // const url = `https://api.dexscreener.com/token-pairs/v1/mode/${daoTokenAddress}`
+  //     const url = `https://api.dexscreener.com/token-pairs/v1/mode/${daoToken}`;
+  //     console.log('url is ', url);
+  //     try {
+  //       // Replace with your actual endpoint or logic
+  //       const response = await fetch(url);
+  //       const data = await response.json();
+  //       console.log('Data from api is  is ', data);
 
-        if (data && Array.isArray(data) && data[0]) {
-          setPrice(data[0].priceUsd);
-          const marketCap = Number(data[0].marketCap).toFixed(0);
-          const liq = Number(data[0].liquidity?.usd).toFixed(0);
-          const volume = Number(data[0].volume?.h24).toFixed(0);
-          setMarketCap(Number(marketCap));
-          setLiquidity(Number(liq));
-          setVolume(Number(volume));
-        } else {
-          console.warn('Market data not in expected format.');
-        }
-      } catch (error) {
-        console.error('Error fetching market data:', error);
-      }
-    };
-    fetchMarketData();
-  }, []);
+  //       if (data && Array.isArray(data) && data[0]) {
+  //         setPrice(data[0].priceUsd);
+  //         const marketCap = Number(data[0].marketCap).toFixed(0);
+  //         const liq = Number(data[0].liquidity?.usd).toFixed(0);
+  //         const volume = Number(data[0].volume?.h24).toFixed(0);
+  //         setMarketCap(Number(marketCap));
+  //         setLiquidity(Number(liq));
+  //         setVolume(Number(volume));
+  //       } else {
+  //         console.warn('Market data not in expected format.');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching market data:', error);
+  //     }
+  //   };
+  //   fetchMarketData();
+  // }, []);
 
   const getFeaturedFunds = (): Fund[] => {
     return [
@@ -140,20 +128,20 @@ const HomePage: NextPage = () => {
       return;
     }
 
-    if (isFinalised) {
-      // If finalised, redirect to the fund page
-      router.push(`/dapp/${fundId}`);
-    } else {
-      // If not finalised, redirect to the contribution page
-      router.push('/dapp/contribution');
-    }
+    // if (isFinalised) {
+    //   // If finalised, redirect to the fund page
+    //   router.push(`/dapp/${fundId}`);
+    // } else {
+    // If not finalised, redirect to the contribution page
+    router.push('/dapp/contribution');
+    // }
   };
   const redirectToDashboard = () => {
-    if (isFinalised) {
-      router.push('/dapp/1');
-    } else {
+    // if (isFinalised) {
+    // router.push('/dapp/1');
+    // } else {
       router.push('/dapp/contribution');
-    }
+    // }
   };
 
   return (
@@ -192,7 +180,7 @@ const HomePage: NextPage = () => {
               Sorcerer is an investment DAO on Monad, that strategically fund AI agents and AI-driven projects,
               empowering the next wave of decentralized intelligence and autonomous ecosystems.
             </p>
-            <PoolDetailCard marketCap={marketCap || 0} liquidity={liquidity || 0} volume={volume || 0} />
+            <PoolDetailCard marketCap={0} liquidity={0} volume={0} />
           </div>
         </div>
       </div>

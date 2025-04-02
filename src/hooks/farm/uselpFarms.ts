@@ -28,7 +28,7 @@ const useLpFarms = () => {
   // const { toast } = useToast();
   const { address } = useAccount();
   const publicClient = usePublicClient();
-  const { fetchTokenPrice } = useTokenPrice();
+  const { fetchTokenPriceDexScreener } = useTokenPrice();
   const { writeContractAsync } = useWriteContract();
 
   // const KEY_STRUCT = [LP_FARM_REWARD_TOKEN, LP_FARM_POOL, LP_FARM_START_TIME, LP_FARM_END_TIME, LP_FARM_REFUNDEE];
@@ -108,7 +108,7 @@ const useLpFarms = () => {
         upperTick: tickUpper,
       });
 
-      const tokenPricePromises = [fetchTokenPrice(token0), fetchTokenPrice(token1)];
+      const tokenPricePromises = [fetchTokenPriceDexScreener(token0), fetchTokenPriceDexScreener(token1)];
       const [token0Price, token1Price] = await Promise.all(tokenPricePromises);
 
       const token0Amount = Number(formatUnits(BigInt(amounts.amount0InWei), 18)) * token0Price;

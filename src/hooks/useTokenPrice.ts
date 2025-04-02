@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const useTokenPrice = () => {
-  const fetchTokenPrice = async (address: `0x${string}`) => {
+  const fetchTokenPriceDexScreener = async (address: `0x${string}`) => {
     try {
       const response = await axios.get(`https://api.dexscreener.com/token-pairs/v1/mode/${address}`);
       return response.data[0].priceUsd;
@@ -9,7 +9,7 @@ const useTokenPrice = () => {
       return null;
     }
   };
-  const fetchTokenPriceGeko = async (address: `0x${string}`) => {
+  const fetchTokenPriceCoingecko = async (address: `0x${string}`) => {
     try {
       const response = await axios.get(
         `https://api.geckoterminal.com/api/v2/simple/networks/mode/token_price/${address}`,
@@ -19,7 +19,7 @@ const useTokenPrice = () => {
       return null;
     }
   };
-  return { fetchTokenPrice, fetchTokenPriceGeko };
+  return { fetchTokenPriceDexScreener, fetchTokenPriceCoingecko };
 };
 
 export default useTokenPrice;

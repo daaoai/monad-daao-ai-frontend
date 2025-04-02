@@ -1,1 +1,1 @@
-export const DAO_ADDRESS = '0xC201EA874E80fDaf67EEDf6ffB957F84FbB61468';
+export const TIER_LABELS = ['None', 'Platinum', 'Gold', 'Silver'];

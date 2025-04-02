@@ -3,7 +3,7 @@ import { quoterAddress, swapRouterAddress, veloFactoryAddress, wmonTokenAddress 
 import { CURRENT_DAO_IMAGE } from '@/constants/links';
 import { tickSpacing } from '@/constants/modeChain';
 import { DAO_TOKEN_ABI } from '@/daao-sdk/abi/daoToken';
-import { MODE_ABI } from '@/daao-sdk/abi/mode';
+import { TOKEN_ABI } from '@/daao-sdk/abi/mode';
 import { ROUTER_ABI } from '@/daao-sdk/abi/router';
 import { SWAP_ROUTER_SIMULATE } from '@/daao-sdk/abi/swapRouterSimulate';
 import { UNI_FACTORY_ABI } from '@/daao-sdk/abi/uniFactory';
@@ -43,7 +43,7 @@ const BuySellCard = () => {
   const { daoBalance, setDaoBalance } = useFundContext();
   const { ticketIds, refetch: refetchTickets } = useGetUserTickets();
   const accountAddress = account.address as `0x${string}`;
-  const { data: fetchedData, refreshData } = useFetchBalance(accountAddress);
+  const { data: fetchedData, refreshData } = useFetchBalance();
 
   const { data: daoReadData, refetch } = useReadContracts({
     contracts: daoTokenAddress
@@ -245,7 +245,7 @@ const BuySellCard = () => {
   async function checkAndApproveMODE(signer: ethers.Signer) {
     if (!daoTokenAddress) return;
     const userAddress = await signer.getAddress();
-    const ModeTokenContract = new ethers.Contract(wmonTokenAddress, MODE_ABI, signer);
+    const ModeTokenContract = new ethers.Contract(wmonTokenAddress, TOKEN_ABI, signer);
 
     const requiredAmountBN = ethers.utils.parseUnits(amountFrom || '0', 18);
 

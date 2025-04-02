@@ -1,4 +1,4 @@
-export const MODE_ABI = [
+export const TOKEN_ABI = [
   {
     inputs: [{ internalType: 'address', name: 'initialOwner', type: 'address' }],
     stateMutability: 'nonpayable',
@@ -492,4 +492,4 @@ export const MODE_ABI = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-];
+] as const;
