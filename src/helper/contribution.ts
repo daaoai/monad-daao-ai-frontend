@@ -1,19 +1,16 @@
-import { daoAddress } from '@/constants/addresses';
 import { DAO_CONTRACT_ABI } from '@/daao-sdk/abi/abi';
 import { UserContributionInfo } from '@/types/contribution';
 import { DaoInfo } from '@/types/dao';
 import { multicallForSameContract } from '@/utils/multicall';
 import { getPublicClient } from '@/utils/publicClient';
-import { Hex, formatUnits, getContract } from 'viem';
+import { Hex, getContract } from 'viem';
 
 export const fetchDaoInfo = async ({
   chainId,
   daoAddress,
-  tokenDecimals,
 }: {
   chainId: number;
   daoAddress: Hex;
-  tokenDecimals: number;
 }): Promise<DaoInfo | null> => {
   try {
     const daoFunctions = [
@@ -44,7 +41,6 @@ export const fetchDaoInfo = async ({
       params: daoFunctions.map(() => []),
     })) as [bigint, bigint, boolean, boolean, bigint, Hex, Hex, boolean];
 
-    // not coming from multicall
     const publicClient = getPublicClient(chainId);
     const contract = getContract({
       client: publicClient,
@@ -54,8 +50,8 @@ export const fetchDaoInfo = async ({
     const isPaymentTokenNative = await contract.read.isPaymentTokenNative();
 
     return {
-      fundraisingGoal: Number(formatUnits(fundraisingGoal, tokenDecimals)),
-      totalRaised: Number(formatUnits(totalRaised, tokenDecimals)),
+      fundraisingGoal,
+      totalRaised,
       goalReached,
       fundraisingFinalized,
       daoToken,
@@ -96,20 +92,20 @@ export const fetchUserContributionInfo = async ({
     whitelistInfo: {
       isWhitelisted: whitelistInfo?.[0] ?? false,
       tier: whitelistInfo?.[1] ?? 0,
-      limit: Number(formatUnits(whitelistInfo?.[2] ?? BigInt(0), tokenDecimals)),
+      limit: whitelistInfo?.[2] ?? BigInt(0),
     },
-    contributions: Number(formatUnits(contributions ?? BigInt(0), tokenDecimals)),
+    contributions: contributions ?? BigInt(0),
   };
 };
 
 export const fetchTierLimits = async ({
   tier,
-  tokenDecimals,
   chainId,
+  daoAddress,
 }: {
   tier: number;
-  tokenDecimals: number;
   chainId: number;
+  daoAddress: Hex;
 }) => {
   try {
     const publicClient = getPublicClient(chainId);
@@ -119,9 +115,9 @@ export const fetchTierLimits = async ({
       functionName: 'tierLimits',
       args: [tier],
     });
-    return Number(formatUnits(tierLimits, tokenDecimals));
+    return tierLimits;
   } catch (err) {
     console.log({ err });
-    return 0;
+    return BigInt(0);
   }
 };

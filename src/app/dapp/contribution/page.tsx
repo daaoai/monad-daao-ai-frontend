@@ -8,6 +8,7 @@ import { Button } from '@/shadcn/components/ui/button';
 import { Input } from '@/shadcn/components/ui/input';
 import { UserContributionInfo } from '@/types/contribution';
 import { DaoInfo } from '@/types/dao';
+import Decimal from 'decimal.js';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast as reactToast } from 'react-toastify';
@@ -36,7 +37,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [daoInfoData, setDaoInfoData] = useState<DaoInfo | null>(null);
   const [userContributionInfo, setUserContributionInfo] = useState<UserContributionInfo | null>(null);
-  const [tierLimits, setTierLimits] = useState<number>(0);
+  const [tierLimits, setTierLimits] = useState<bigint>(BigInt(0));
 
   async function handleContribute() {
     if (!account) {
@@ -44,13 +45,13 @@ export default function Page() {
       return;
     }
 
-    const formattedAmount = Number.parseFloat(inputValue);
-    if (!formattedAmount || isNaN(formattedAmount) || formattedAmount <= 0) {
+    const formattedAmount = new Decimal(inputValue);
+    if (!formattedAmount || isNaN(formattedAmount.toNumber()) || formattedAmount.toNumber() <= 0) {
       reactToast.error('Please enter a valid amount');
       return;
     }
 
-    const amountInUnits = parseUnits(formattedAmount.toString(), 18);
+    const amountInUnits = parseUnits(formattedAmount.toFixed(18), 18);
 
     if (amountInUnits > chainsData[chainId].contribution.maxAmount) {
       reactToast.error('Amount should be lower than 0.1');
@@ -58,9 +59,10 @@ export default function Page() {
     }
 
     const contributionLimit = tierLimits;
-    const currentContributions = userContributionInfo?.contributions || 0;
+    const currentContributions = userContributionInfo?.contributions || BigInt(0);
 
-    if (formattedAmount + currentContributions > contributionLimit) {
+    if (amountInUnits + currentContributions > contributionLimit) {
+      // if (formattedAmount.plus(currentContributions).gt(contributionLimit)) {
       reactToast.error(`Contribution exceeds your tier limit of ${contributionLimit}`);
       return;
     }
@@ -68,8 +70,10 @@ export default function Page() {
     // Check user's balance against contribution amount
     if (fetchedData?.balance !== undefined) {
       const userBalance = Number(fetchedData.balance);
-      if (formattedAmount > userBalance) {
-        reactToast.error(`Insufficient balance. You have ${userBalance.toFixed(2)} MONAD available`);
+      if (formattedAmount.gt(userBalance)) {
+        reactToast.error(
+          `Insufficient balance. You have ${userBalance.toFixed(2)} ${contributionTokenDetails.name} available`,
+        );
         return;
       }
     }
@@ -141,9 +145,28 @@ export default function Page() {
     fetchTokenPrice();
   }, []);
 
+  // const totalRaisedPercentage = daoInfoData?.totalRaised
+  //   ? (daoInfoData?.totalRaised / daoInfoData?.fundraisingGoal) * 100
+  //   : 0;
+
   const totalRaisedPercentage = daoInfoData?.totalRaised
-    ? (daoInfoData?.totalRaised / daoInfoData?.fundraisingGoal) * 100
+    ? new Decimal(daoInfoData?.totalRaised.toString())
+        .dividedBy(daoInfoData?.fundraisingGoal.toString())
+        .times(100)
+        .toNumber()
     : 0;
+
+  const totalRaisedFormatted = formatUnits(daoInfoData?.totalRaised || BigInt(0), contributionTokenDetails.decimals);
+  const fundraisingGoalFormatted = formatUnits(
+    daoInfoData?.fundraisingGoal || BigInt(0),
+    contributionTokenDetails.decimals,
+  );
+
+  const contributionsFormatted = formatUnits(
+    userContributionInfo?.contributions || BigInt(0),
+    contributionTokenDetails.decimals,
+  );
+  const tierLimitsFormatted = formatUnits(tierLimits, contributionTokenDetails.decimals);
 
   const remainingContribution = Number(tierLimits) - Number(userContributionInfo?.contributions || 0) || 0;
 
@@ -166,8 +189,8 @@ export default function Page() {
                 <div className="flex flex-col items-start mb-1 justify-start">
                   <p className="text-[#C4F82A] font-medium">Total Raised</p>
                   <p className="text-sm font-bold">
-                    {daoInfoData?.totalRaised} MONAD ($
-                    {daoInfoData?.totalRaised ? (daoInfoData?.totalRaised * tokenPrice).toFixed(2) : 0})
+                    {totalRaisedFormatted} MONAD ($
+                    {daoInfoData?.totalRaised ? Number(totalRaisedFormatted).toFixed(2) : 0})
                   </p>
                 </div>
               </div>
@@ -197,8 +220,8 @@ export default function Page() {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Funding Goal</span>
                   <span>
-                    MONAD {daoInfoData?.fundraisingGoal} ($
-                    {daoInfoData?.fundraisingGoal ? (daoInfoData?.fundraisingGoal * tokenPrice).toFixed(2) : 0})
+                    MONAD {fundraisingGoalFormatted} ($
+                    {daoInfoData?.fundraisingGoal ? (Number(fundraisingGoalFormatted) * tokenPrice).toFixed(2) : 0})
                   </span>
                 </div>
               </div>
@@ -240,11 +263,11 @@ export default function Page() {
                   <div className="flex flex-col gap-2">
                     <div className="flex justify-between">
                       <p className="text-gray-400 mb-1">Max </p>
-                      <p className="text-xl">{tierLimits}</p>
+                      <p className="text-xl">{tierLimitsFormatted}</p>
                     </div>
                     <div className="flex justify-between">
                       <p className="text-gray-400">Committed</p>
-                      <p className="text-xl">{userContributionInfo.contributions || 0}</p>
+                      <p className="text-xl">{contributionsFormatted || 0}</p>
                     </div>
                   </div>
                 </div>

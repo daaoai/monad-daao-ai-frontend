@@ -2,7 +2,7 @@ export type UserContributionInfo = {
   whitelistInfo: {
     isWhitelisted: boolean;
     tier: number;
-    limit: number;
+    limit: bigint;
   };
-  contributions: number;
+  contributions: bigint;
 };

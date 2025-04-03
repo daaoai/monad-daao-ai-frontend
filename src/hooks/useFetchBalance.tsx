@@ -14,8 +14,8 @@ export const useFetchBalance = () => {
     balance: '0',
     tierNumber: 0,
     isWhitelisted: false,
-    maxLimit: 0,
-    contributedAmountYet: 0,
+    maxLimit: BigInt(0),
+    contributedAmountYet: BigInt(0),
     daoToken: '',
     goalReached: false,
     finalisedFundraising: false,
@@ -27,7 +27,6 @@ export const useFetchBalance = () => {
 
   const refetch = async () => {
     if (chainId) {
-      // const { getDaoInfo, getUserContributionInfo, getTierLimits } = useContribution({ chainId });
       const chainData = chainsData[chainId];
       const daoAddress = chainData.daoAddress;
       const tokenDetails = chainData.contribution.token;
@@ -36,7 +35,6 @@ export const useFetchBalance = () => {
         return fetchDaoInfo({
           daoAddress,
           chainId,
-          tokenDecimals: tokenDetails.decimals,
         });
       };
 
@@ -53,7 +51,7 @@ export const useFetchBalance = () => {
         return fetchTierLimits({
           chainId,
           tier,
-          tokenDecimals: tokenDetails.decimals,
+          daoAddress,
         });
       };
 
@@ -61,7 +59,7 @@ export const useFetchBalance = () => {
 
       let userContributionInfo: UserContributionInfo | undefined;
       let balance = BigInt(0);
-      let tierLimit = 0;
+      let tierLimit = BigInt(0);
 
       if (account) {
         const publicClient = getPublicClient(chainId);
@@ -97,7 +95,7 @@ export const useFetchBalance = () => {
         balance: formatUnits(balance, tokenDetails.decimals),
         tierNumber: userContributionInfo?.whitelistInfo.tier || 0,
         isWhitelisted: userContributionInfo?.whitelistInfo.isWhitelisted || false,
-        contributedAmountYet: userContributionInfo?.contributions || 0,
+        contributedAmountYet: userContributionInfo?.contributions || BigInt(0),
         daoToken: daoInfo?.daoToken || '',
         goalReached: daoInfo?.goalReached || false,
         finalisedFundraising: daoInfo?.fundraisingFinalized || false,

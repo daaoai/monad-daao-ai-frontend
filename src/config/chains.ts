@@ -15,6 +15,8 @@ export const chainsData: {
       token: {
         address: '0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701',
         decimals: 18,
+        symbol: "MON",
+        name: "Monad"
       },
       minAmount: BigInt(0),
       maxAmount: parseUnits('0.1', 18),
@@ -41,6 +43,8 @@ export const chainsData: {
       token: {
         address: '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
         decimals: 18,
+        symbol: 'CAKE',
+        name: 'CAKE',
       },
       minAmount: BigInt(0),
       maxAmount: parseUnits('1', 18),

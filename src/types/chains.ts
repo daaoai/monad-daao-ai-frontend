@@ -15,6 +15,8 @@ export type ChainsConfig = {
     token: {
       address: Hex;
       decimals: number;
+      symbol: string;
+      name: string;
     };
     minAmount: bigint;
     maxAmount: bigint;

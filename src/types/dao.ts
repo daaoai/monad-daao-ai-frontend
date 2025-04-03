@@ -1,8 +1,8 @@
 import { Hex } from 'viem';
 
 export type DaoInfo = {
-  fundraisingGoal: number;
-  totalRaised: number;
+  fundraisingGoal: bigint;
+  totalRaised: bigint;
   goalReached: boolean;
   fundraisingFinalized: boolean;
   fundraisingDeadline: number;
