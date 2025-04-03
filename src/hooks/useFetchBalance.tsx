@@ -1,31 +1,21 @@
+import { chainsData } from '@/config/chains';
+import { TIER_LABELS } from '@/constants/contribution';
+import { fetchDaoInfo, fetchTierLimits, fetchUserContributionInfo } from '@/helper/contribution';
+import { UserContributionInfo } from '@/types/contribution';
+import { getPublicClient } from '@/utils/publicClient';
 import { useEffect, useState } from 'react';
-// import { useToast } from '@/hooks/use-toast';
-import { useReadContracts } from 'wagmi';
-import { ethers } from 'ethers';
-import { CONTRACT_ABI } from '@/daao-sdk/abi/abi';
-import { MODE_ABI } from '@/daao-sdk/abi/mode';
-import { daoAddress, wmonTokenAddress } from '@/constants/addresses';
+import { erc20Abi, formatUnits } from 'viem';
+import { useAccount } from 'wagmi';
 
-const wagmiModeContract = {
-  address: wmonTokenAddress,
-  abi: MODE_ABI,
-} as const;
+export const useFetchBalance = () => {
+  const { address: account, chainId } = useAccount();
 
-const wagmiDaoContract = {
-  address: daoAddress,
-  abi: CONTRACT_ABI,
-} as const;
-
-const TIER_LABELS = ['None', 'Platinum', 'Gold', 'Silver'];
-
-//Fetch Mode Balance
-export const useFetchBalance = (accountAddress: `0x${string}` | undefined) => {
   const [data, setData] = useState({
     balance: '0',
     tierNumber: 0,
     isWhitelisted: false,
-    maxLimit: 0,
-    contributedAmountYet: 0,
+    maxLimit: BigInt(0),
+    contributedAmountYet: BigInt(0),
     daoToken: '',
     goalReached: false,
     finalisedFundraising: false,
@@ -35,138 +25,106 @@ export const useFetchBalance = (accountAddress: `0x${string}` | undefined) => {
     userTierLabel: 'None',
   });
 
-  const {
-    data: contractData,
-    error,
-    refetch,
-  } = useReadContracts({
-    contracts: [
-      // Fetch balance
-      {
-        ...wagmiModeContract,
-        functionName: 'balanceOf',
-        args: accountAddress ? [accountAddress] : [],
-      },
-      // Fetch whitelist info
-      {
-        ...wagmiDaoContract,
-        functionName: 'getWhitelistInfo',
-        args: accountAddress ? [accountAddress] : [],
-      },
-      // Fetch fundraising goal
-      {
-        ...wagmiDaoContract,
-        functionName: 'fundraisingGoal',
-        args: [],
-      },
-      // Fetch total raised
-      {
-        ...wagmiDaoContract,
-        functionName: 'totalRaised',
-        args: [],
-      },
-      // Fetch goal reached status
-      {
-        ...wagmiDaoContract,
-        functionName: 'goalReached',
-        args: [],
-      },
-      // Fetch finalised fundraising status
-      {
-        ...wagmiDaoContract,
-        functionName: 'fundraisingFinalized',
-        args: [],
-      },
-      // Fetch fundraising deadline
-      {
-        ...wagmiDaoContract,
-        functionName: 'fundraisingDeadline',
-        args: [],
-      },
-      // Fetch DAO Token Address
-      {
-        ...wagmiDaoContract,
-        functionName: 'daoToken',
-        args: [],
-      },
-      //Contributions
-      {
-        ...wagmiDaoContract,
-        functionName: 'contributions',
-        args: accountAddress ? [accountAddress] : [],
-      },
-      // payment token adrres
-      {
-        ...wagmiDaoContract,
-        functionName: 'PAYMENT_TOKEN',
-      },
-    ],
-  });
-  console.log('data is', contractData);
-  const { data: tierLimitData, refetch: refetchTierLimit } = useReadContracts({
-    contracts: [
-      {
-        ...wagmiDaoContract,
-        functionName: 'tierLimits',
-        args: data.tierNumber ? [data.tierNumber] : [],
-      },
-    ],
-  });
+  const refetch = async () => {
+    if (chainId) {
+      const chainData = chainsData[chainId];
+      const daoAddress = chainData.daoAddress;
+      const tokenDetails = chainData.contribution.token;
 
-  useEffect(() => {
-    if (error) {
-      console.error('Error fetching contract data:', error);
-      return;
-    }
+      const getDaoInfo = async () => {
+        return fetchDaoInfo({
+          daoAddress,
+          chainId,
+        });
+      };
 
-    if (contractData) {
-      console.log('Fetched contract data:', contractData);
+      const getUserContributionInfo = async () => {
+        return fetchUserContributionInfo({
+          account,
+          daoAddress,
+          chainId,
+          tokenDecimals: tokenDetails.decimals,
+        });
+      };
 
-      // Extracting data from contract responses
-      const balanceRaw = contractData[0]?.result as bigint;
-      const whitelistInfoData = contractData[1]?.result as Array<any>;
-      const fundraisingGoal = contractData[2]?.result?.toString() || '0';
-      const totalRaised = contractData[3]?.result?.toString() || '0';
-      const goalReached = contractData[4]?.result as boolean;
-      const finalisedFundraising = contractData[5]?.result as boolean;
-      const end = contractData[6]?.result as bigint;
-      const daoToken = contractData[7]?.result as string;
-      const contributedAmountYet = Number(contractData[8]?.result) / 10 ** 18;
+      const getTierLimits = async (tier: number) => {
+        return fetchTierLimits({
+          chainId,
+          tier,
+          daoAddress,
+        });
+      };
 
-      const modeBalance = balanceRaw ? ethers.utils.formatUnits(balanceRaw, 18) : '0';
+      const daoInfo = await getDaoInfo();
 
-      const isWhitelisted = whitelistInfoData ? whitelistInfoData[0] : false;
-      const tierNumber = whitelistInfoData ? Number(whitelistInfoData[1]) : 0;
+      let userContributionInfo: UserContributionInfo | undefined;
+      let balance = BigInt(0);
+      let tierLimit = BigInt(0);
 
-      const userTierLabel = TIER_LABELS[tierNumber] || 'None';
+      if (account) {
+        const publicClient = getPublicClient(chainId);
+        const [balanceRes, userContributionInfoRes] = await Promise.allSettled([
+          daoInfo?.isPaymentTokenNative
+            ? publicClient.getBalance({
+                address: account,
+              })
+            : publicClient.readContract({
+                abi: erc20Abi,
+                address: tokenDetails.address,
+                functionName: 'balanceOf',
+                args: [account],
+              }),
+          getUserContributionInfo(),
+        ]);
+
+        if (balanceRes.status === 'fulfilled') {
+          balance = balanceRes.value as bigint;
+        } else {
+          console.error('Balance fetch error:', balanceRes.reason);
+        }
+        if (userContributionInfoRes.status === 'fulfilled') {
+          userContributionInfo = userContributionInfoRes.value;
+          tierLimit = await getTierLimits(userContributionInfo.whitelistInfo.tier);
+        } else {
+          console.error('User contribution info fetch error:', userContributionInfoRes.reason);
+        }
+      }
+
       setData((prev) => ({
         ...prev,
-
-        balance: modeBalance,
-        tierNumber,
-        isWhitelisted,
-        contributedAmountYet,
-        daoToken,
-        goalReached,
-        finalisedFundraising,
-        endDate: (Number(end) * 1000).toString(),
-        fundraisingGoal,
-        totalRaised,
-        userTierLabel,
+        balance: formatUnits(balance, tokenDetails.decimals),
+        tierNumber: userContributionInfo?.whitelistInfo.tier || 0,
+        isWhitelisted: userContributionInfo?.whitelistInfo.isWhitelisted || false,
+        contributedAmountYet: userContributionInfo?.contributions || BigInt(0),
+        daoToken: daoInfo?.daoToken || '',
+        goalReached: daoInfo?.goalReached || false,
+        finalisedFundraising: daoInfo?.fundraisingFinalized || false,
+        endDate: (Number(daoInfo?.fundraisingDeadline) * 1000).toString(),
+        maxLimit: tierLimit,
+        fundraisingGoal: daoInfo?.fundraisingGoal.toString() || '0',
+        totalRaised: daoInfo?.totalRaised.toString() || '0',
+        userTierLabel: userContributionInfo?.whitelistInfo.tier
+          ? TIER_LABELS[userContributionInfo?.whitelistInfo.tier] || 'None'
+          : 'None',
       }));
-      if (tierLimitData) {
-        const maxLimitRaw = tierLimitData[0]?.result as bigint;
-        const maxLimit = maxLimitRaw ? Number(maxLimitRaw.toString()) / 10 ** 18 : 0;
-        setData((prev) => ({ ...prev, maxLimit }));
-      }
     }
-  }, [contractData, tierLimitData, error]);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await refetch();
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [account, chainId]);
 
   const refreshData = async () => {
     console.log('🔄 Refetching contract data...');
     await refetch();
-    await refetchTierLimit();
   };
-  console.log({ Pk: data });
   return { data, refreshData };
 };

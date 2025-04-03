@@ -1,28 +1,32 @@
-import { DAO_ADDRESS } from '@/constants/contribution';
-import { useAccount, useWriteContract } from 'wagmi';
+import { chainsData } from '@/config/chains';
+import { DAO_CONTRACT_ABI } from '@/daao-sdk/abi/abi';
 import { CARTEL } from '@/daao-sdk/abi/cartel';
-import { CONTRACT_ABI } from '@/daao-sdk/abi/abi';
-import { usePublicClient } from 'wagmi';
-import { wmonTokenAddress } from '@/constants/addresses';
-import { useState } from 'react';
-import { Abi, formatUnits, Hex, parseUnits } from 'viem';
+import { TOKEN_ABI } from '@/daao-sdk/abi/mode';
+import { fetchDaoInfo, fetchTierLimits, fetchUserContributionInfo } from '@/helper/contribution';
 import { handleViemTransactionError } from '@/utils/approval';
+import { getPublicClient } from '@/utils/publicClient';
+import { useState } from 'react';
 import { toast as reactToast } from 'react-toastify';
+import { Abi, Hex } from 'viem';
+import { useAccount, useWriteContract } from 'wagmi';
 
-const useContribution = () => {
-  const { address } = useAccount();
-  const publicClient = usePublicClient();
+const useContribution = ({ chainId }: { chainId: number }) => {
+  const { address: account } = useAccount();
+  const publicClient = getPublicClient(chainId);
+  const token = chainsData[chainId].contribution.token.address;
+  const tokenDecimals = chainsData[chainId].contribution.token.decimals;
   const { writeContractAsync } = useWriteContract();
   const [approvalTxHash, setApprovalTxHash] = useState<Hex | undefined>(undefined);
 
-  const checkAllowance = async (requiredAmount: number | bigint): Promise<boolean> => {
-    if (!address) return false;
+  const checkAllowance = async (requiredAmount: bigint): Promise<boolean> => {
+    if (!account) return false;
     try {
-      const allowance: unknown = await publicClient?.readContract({
-        address: wmonTokenAddress,
-        abi: CARTEL,
+      const daoAddress = chainsData[chainId].daoAddress;
+      const allowance = await publicClient.readContract({
+        address: token,
+        abi: TOKEN_ABI,
         functionName: 'allowance',
-        args: [address, DAO_ADDRESS],
+        args: [account, daoAddress],
       });
       return BigInt(allowance as bigint) >= BigInt(requiredAmount);
     } catch (err) {
@@ -31,18 +35,19 @@ const useContribution = () => {
     }
   };
 
-  const requestAllowance = async (amountToApprove: number | bigint): Promise<Hex | undefined> => {
-    if (!address) return undefined;
+  const requestAllowance = async ({ amount, token }: { amount: bigint; token: Hex }): Promise<Hex | undefined> => {
+    if (!account) return undefined;
     try {
+      const daoAddress = chainsData[chainId].daoAddress;
       const tx = await writeContractAsync({
-        address: wmonTokenAddress,
-        abi: CARTEL,
+        address: token,
+        abi: TOKEN_ABI,
         functionName: 'approve',
-        args: [DAO_ADDRESS, amountToApprove],
+        args: [daoAddress, amount],
       });
       if (!tx) throw new Error('Approval transaction failed to send');
       setApprovalTxHash(tx);
-      const receipt = await publicClient?.waitForTransactionReceipt({
+      const receipt = await publicClient.waitForTransactionReceipt({
         hash: tx,
         confirmations: 1,
       });
@@ -62,101 +67,49 @@ const useContribution = () => {
   };
 
   const getDaoInfo = async () => {
-    try {
-      const finalizeFundraisingGoal = (await publicClient?.readContract({
-        address: DAO_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'fundraisingGoal',
-      })) as bigint;
-
-      const totalRaised = (await publicClient?.readContract({
-        address: DAO_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'totalRaised',
-      })) as bigint;
-      let whitelistInfo: [boolean, bigint, bigint] | undefined;
-      let contributions: bigint | undefined;
-      if (address) {
-        contributions = (await publicClient?.readContract({
-          address: DAO_ADDRESS,
-          abi: CONTRACT_ABI,
-          functionName: 'contributions',
-          args: [address],
-        })) as bigint;
-        whitelistInfo = (await publicClient?.readContract({
-          address: DAO_ADDRESS,
-          abi: CONTRACT_ABI,
-          functionName: 'getWhitelistInfo',
-          args: [address],
-        })) as [boolean, bigint, bigint];
-      }
-
-      return {
-        finalizeFundraisingGoal: Number(formatUnits(finalizeFundraisingGoal, 18)),
-        totalRaised: Number(formatUnits(totalRaised, 18)),
-        whitelistInfo: {
-          isWhitelisted: whitelistInfo?.[0] ?? false,
-          tier: Number(whitelistInfo?.[1] ?? BigInt(0)),
-          limit: Number(whitelistInfo?.[2] ?? BigInt(0)),
-        },
-        contributions: Number(formatUnits(contributions ?? BigInt(0), 18)),
-      };
-    } catch (err) {
-      console.log({ err });
-      return null;
-    }
+    const daoAddress = chainsData[chainId].daoAddress;
+    return fetchDaoInfo({
+      daoAddress,
+      chainId,
+    });
   };
 
-  const checkWhitelist = async (): Promise<boolean> => {
-    if (!address) return false;
-    try {
-      const whitelistInfo = (await publicClient?.readContract({
-        address: DAO_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'getWhitelistInfo',
-        args: [address],
-      })) as [boolean, bigint, bigint];
-      
-      return whitelistInfo?.[0] ?? false;
-    } catch (err) {
-      console.error('Whitelist check error:', err);
-      return false;
-    }
+  const getUserContributionInfo = async () => {
+    const daoAddress = chainsData[chainId].daoAddress;
+    return fetchUserContributionInfo({
+      account,
+      daoAddress,
+      chainId,
+      tokenDecimals,
+    });
   };
 
-  const contribute = async (amount: number) => {
+  const contribute = async (amount: bigint) => {
     try {
-      if (!address) {
+      const daoAddress = chainsData[chainId].daoAddress;
+      if (!account) {
         reactToast.error('No wallet connected');
         return undefined;
       }
-      
-      const isWhitelisted = await checkWhitelist();
-      if (!isWhitelisted) {
-        reactToast.error('Address not whitelisted');
-        return undefined;
-      }
 
-      const amountInWei = parseUnits(amount.toString(), 18);
-      
       const txHash = await writeContractAsync({
-        address: DAO_ADDRESS,
-        abi: CONTRACT_ABI,
+        address: daoAddress,
+        abi: DAO_CONTRACT_ABI,
         functionName: 'contribute',
-        args: [amountInWei],
-        value: amountInWei,
+        args: [amount],
+        value: amount,
       });
-      
-      const txnReceipt = await publicClient?.waitForTransactionReceipt({
+
+      const txnReceipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
         confirmations: 1,
       });
-      
+
       if (txnReceipt?.status !== 'success') {
         reactToast.error('Contribution failed');
         return undefined;
       }
-      
+
       reactToast.success('Your Contribution was Successful');
       return txHash;
     } catch (err) {
@@ -166,47 +119,40 @@ const useContribution = () => {
     }
   };
 
-  const contributeWithToken = async (amount: number) => {
+  const contributeWithToken = async (amount: bigint) => {
     try {
-      if (!address) {
+      const daoAddress = chainsData[chainId].daoAddress;
+      if (!account) {
         reactToast.error('No wallet connected');
         return undefined;
       }
-      
-      const isWhitelisted = await checkWhitelist();
-      if (!isWhitelisted) {
-        reactToast.error('Address not whitelisted');
-        return undefined;
-      }
-      
-      const amountInWei = parseUnits(amount.toString(), 18);
-      
-      let allowanceSufficient = await checkAllowance(amountInWei);
+
+      let allowanceSufficient = await checkAllowance(amount);
       if (!allowanceSufficient) {
-        await requestAllowance(amountInWei);
-        allowanceSufficient = await checkAllowance(amountInWei);
+        await requestAllowance({ amount, token: token });
+        allowanceSufficient = await checkAllowance(amount);
         if (!allowanceSufficient) {
           throw new Error('Approval failed');
         }
       }
-      
+
       const txHash = await writeContractAsync({
-        address: DAO_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'contributeWithToken',
-        args: [amountInWei],
+        address: daoAddress,
+        abi: DAO_CONTRACT_ABI,
+        functionName: 'contribute',
+        args: [amount],
       });
-      
-      const txnReceipt = await publicClient?.waitForTransactionReceipt({
+
+      const txnReceipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
         confirmations: 1,
       });
-      
+
       if (txnReceipt?.status !== 'success') {
         reactToast.error('Contribution failed');
         return undefined;
       }
-      
+
       reactToast.success('Your Contribution was Successful');
       return txHash;
     } catch (err) {
@@ -217,21 +163,15 @@ const useContribution = () => {
   };
 
   const getTierLimits = async (tier: number) => {
-    try {
-      const tierLimits = await publicClient?.readContract({
-        address: DAO_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'tierLimits',
-        args: [tier],
-      });
-      return tierLimits;
-    } catch (err) {
-      console.log({ err });
-      return BigInt(0);
-    }
+    const daoAddress = chainsData[chainId].daoAddress;
+    return fetchTierLimits({
+      tier,
+      chainId,
+      daoAddress,
+    });
   };
 
-  return { getDaoInfo, contribute, getTierLimits, contributeWithToken, checkWhitelist };
+  return { getDaoInfo, contribute, getTierLimits, contributeWithToken, getUserContributionInfo };
 };
 
 export default useContribution;

@@ -1,15 +1,12 @@
 'use client';
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Wallet } from 'lucide-react';
-import { mode, goerli, sepolia, berachain, monadTestnet } from 'wagmi/chains'; // Import networks
-import Image from 'next/image'; // Import Image component for displaying chain icons
+import { supportedChainIds } from '@/constants/chains';
 import { Button } from '@/shadcn/components/ui/button';
 import { cn } from '@/shadcn/lib/utils';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Wallet } from 'lucide-react';
+import Image from 'next/image'; // Import Image component for displaying chain icons
 import React from 'react';
-
-// Array containing Ethereum chain IDs (mainnet, goerli, sepolia)
-const ethChainIds: number[] = [mode.id, goerli.id, sepolia.id, berachain.id, monadTestnet.id];
 
 interface ConnectWalletButtonProps {
   className?: string;
@@ -23,7 +20,7 @@ export const ConnectWalletButton: React.FC<ConnectWalletButtonProps> = ({ classN
         const ready = mounted && authenticationStatus !== 'loading';
         const connected =
           ready && account && chain && (!authenticationStatus || authenticationStatus === 'authenticated');
-        const isEthChain = chain && ethChainIds.includes(chain.id);
+        const isEthChain = chain && Object.values(supportedChainIds).includes(chain.id);
 
         return (
           <div

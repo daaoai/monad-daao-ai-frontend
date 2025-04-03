@@ -1,10 +1,9 @@
-import '../globals.css';
 import ProviderWrapper from '@/wagmi/ProviderWrapper';
-import React from 'react';
 import '@rainbow-me/rainbowkit/styles.css';
-import { Toaster } from 'sonner';
+import React from 'react';
 import { ToastContainer } from 'react-toastify'; // Import ToastContainer
 import 'react-toastify/dist/ReactToastify.css';
+import '../globals.css';
 export const metadata = {
   title: 'Daao App',
   description: 'Daao App',

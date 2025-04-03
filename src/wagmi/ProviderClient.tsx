@@ -1,15 +1,15 @@
 'use client';
+import { store } from '@/store';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactNode, useMemo } from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
 import { cookieToInitialState, WagmiProvider } from 'wagmi';
 import { getWagmiConfig } from '.';
-import { mode } from 'wagmi/chains';
-import { ReactNode, useMemo } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { store } from '@/store';
-import { Provider as ReduxProvider } from 'react-redux';
 // import { SessionProvider } from 'next-auth/react';
-import { ThemeProvider } from '@/components/theme-provider';
 import { FundProvider } from '@/components/dashboard/FundContext';
+import { ThemeProvider } from '@/components/theme-provider';
+import { supportedChainIds } from '@/constants/chains';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -28,7 +28,7 @@ const ProviderClient = ({ wagmiCookie, children }: ProviderClientProps) => {
       <WagmiProvider config={wagmiConfig} initialState={initialWagmiState}>
         {/* <SessionProvider session={pageProps.session}> */}
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider initialChain={mode.id}>
+          <RainbowKitProvider initialChain={supportedChainIds.monad}>
             <ThemeProvider
               attribute="class"
               defaultTheme="dark"

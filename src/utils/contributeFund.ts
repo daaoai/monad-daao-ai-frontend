@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { CONTRACT_ABI } from '../daao-sdk/abi/abi';
+import { DAO_CONTRACT_ABI } from '../daao-sdk/abi/abi';
 import { ERC_20_ABI } from '../daao-sdk/abi/erc20';
 import { daoAddress, wmonTokenAddress } from '@/constants/addresses';
 
@@ -28,7 +28,7 @@ export const handleContribute = async (amount: string) => {
     const weiAmount = web3.utils.toWei(amount.toString(), 'ether');
     console.log('Converting amount to wei:', weiAmount);
 
-    const daosContract = new web3.eth.Contract(CONTRACT_ABI as any, daoAddress);
+    const daosContract = new web3.eth.Contract(DAO_CONTRACT_ABI as any, daoAddress);
     console.log('Contract object created:', daosContract);
 
     const contributedAmountYetRaw = await daosContract.methods.contributions(contributor).call();

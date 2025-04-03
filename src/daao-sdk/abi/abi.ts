@@ -1,145 +1,72 @@
-export const CONTRACT_ABI = [
+export const DAO_CONTRACT_ABI = [
   {
     inputs: [
-      {
-        internalType: 'uint256',
-        name: '_fundraisingGoal',
-        type: 'uint256',
-      },
+      { internalType: 'uint256', name: '_fundraisingGoal', type: 'uint256' },
       { internalType: 'string', name: '_name', type: 'string' },
       { internalType: 'string', name: '_symbol', type: 'string' },
-      {
-        internalType: 'uint256',
-        name: '_fundraisingDeadline',
-        type: 'uint256',
-      },
+      { internalType: 'uint256', name: '_fundraisingDeadline', type: 'uint256' },
       { internalType: 'uint256', name: '_fundExpiry', type: 'uint256' },
       { internalType: 'address', name: '_daoManager', type: 'address' },
-      {
-        internalType: 'address',
-        name: '_liquidityLockerFactory',
-        type: 'address',
-      },
+      { internalType: 'address', name: '_liquidityLockerFactory', type: 'address' },
       { internalType: 'address', name: '_protocolAdmin', type: 'address' },
+      { internalType: 'address', name: '_paymentToken', type: 'address' },
+      { internalType: 'address', name: '_v3NonfungiblePositionManager', type: 'address' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
   },
-  {
-    inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
-    name: 'OwnableInvalidOwner',
-    type: 'error',
-  },
+  { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }], name: 'OwnableInvalidOwner', type: 'error' },
   {
     inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
     name: 'OwnableUnauthorizedAccount',
     type: 'error',
   },
+  { inputs: [], name: 'R', type: 'error' },
   { inputs: [], name: 'ReentrancyGuardReentrantCall', type: 'error' },
   {
     inputs: [{ internalType: 'address', name: 'token', type: 'address' }],
     name: 'SafeERC20FailedOperation',
     type: 'error',
   },
+  { inputs: [], name: 'T', type: 'error' },
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'contributor',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
+      { indexed: true, internalType: 'address', name: 'contributor', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
     ],
     name: 'Contribution',
     type: 'event',
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'message',
-        type: 'string',
-      },
-    ],
-    name: 'DebugLog',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'bool',
-        name: 'success',
-        type: 'bool',
-      },
-    ],
+    inputs: [{ indexed: false, internalType: 'bool', name: 'success', type: 'bool' }],
     name: 'FundraisingFinalized',
     type: 'event',
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
+    inputs: [{ indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
     name: 'LPTokenMinted',
     type: 'event',
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'lockerAddress',
-        type: 'address',
-      },
-    ],
+    inputs: [{ indexed: true, internalType: 'address', name: 'lockerAddress', type: 'address' }],
     name: 'LockerDeployed',
     type: 'event',
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
+    inputs: [{ indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
     name: 'LockerInitialized',
     type: 'event',
   },
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'contributor',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'tokensToMint',
-        type: 'uint256',
-      },
+      { indexed: true, internalType: 'address', name: 'contributor', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'tokensToMint', type: 'uint256' },
     ],
     name: 'MintDetails',
     type: 'event',
@@ -147,30 +74,10 @@ export const CONTRACT_ABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'token0',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'token1',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'liquidity',
-        type: 'uint256',
-      },
+      { indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+      { indexed: false, internalType: 'address', name: 'token0', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'token1', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'liquidity', type: 'uint256' },
     ],
     name: 'MintParamsCreated',
     type: 'event',
@@ -178,95 +85,44 @@ export const CONTRACT_ABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'previousOwner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
+      { indexed: true, internalType: 'address', name: 'previousOwner', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newOwner', type: 'address' },
     ],
     name: 'OwnershipTransferred',
     type: 'event',
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'pool',
-        type: 'address',
-      },
-    ],
+    inputs: [{ indexed: true, internalType: 'address', name: 'pool', type: 'address' }],
     name: 'PoolCreated',
     type: 'event',
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint160',
-        name: 'sqrtPriceX96',
-        type: 'uint160',
-      },
-    ],
+    inputs: [{ indexed: false, internalType: 'uint160', name: 'sqrtPriceX96', type: 'uint160' }],
     name: 'PoolInitialized',
     type: 'event',
   },
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'contributor',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
+      { indexed: true, internalType: 'address', name: 'contributor', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
     ],
     name: 'Refund',
     type: 'event',
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
+    inputs: [{ indexed: false, internalType: 'address', name: '', type: 'address' }],
     name: 'RemoveWhitelist',
     type: 'event',
   },
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'enum Daao.WhitelistTier',
-        name: 'teir',
-        type: 'uint8',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: '_newLimit',
-        type: 'uint256',
-      },
+      { indexed: true, internalType: 'enum Daao.WhitelistTier', name: 'teir', type: 'uint8' },
+      { indexed: false, internalType: 'uint256', name: '_newLimit', type: 'uint256' },
     ],
     name: 'TierLimitUpdated',
     type: 'event',
@@ -274,18 +130,8 @@ export const CONTRACT_ABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'lockerAddress',
-        type: 'address',
-      },
+      { indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+      { indexed: false, internalType: 'address', name: 'lockerAddress', type: 'address' },
     ],
     name: 'TokenTransferredToLocker',
     type: 'event',
@@ -293,18 +139,8 @@ export const CONTRACT_ABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'enum Daao.WhitelistTier',
-        name: 'tier',
-        type: 'uint8',
-      },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'enum Daao.WhitelistTier', name: 'tier', type: 'uint8' },
     ],
     name: 'UpdateWhitelist',
     type: 'event',
@@ -332,7 +168,7 @@ export const CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: 'MODE',
+    name: 'PAYMENT_TOKEN',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
@@ -354,13 +190,7 @@ export const CONTRACT_ABI = [
   {
     inputs: [],
     name: 'POSITION_MANAGER',
-    outputs: [
-      {
-        internalType: 'contract INonfungiblePositionManager',
-        name: '',
-        type: 'address',
-      },
-    ],
+    outputs: [{ internalType: 'contract INonfungiblePositionManager', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -394,29 +224,15 @@ export const CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: 'VELODROME_FACTORY',
-    outputs: [
-      {
-        internalType: 'contract IVelodromeFactory',
-        name: '',
-        type: 'address',
-      },
-    ],
+    name: 'UNISWAP_V3_FACTORY',
+    outputs: [{ internalType: 'contract IUniswapV3Factory', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
-      {
-        internalType: 'address[]',
-        name: '_addresses',
-        type: 'address[]',
-      },
-      {
-        internalType: 'enum Daao.WhitelistTier[]',
-        name: '_tiers',
-        type: 'uint8[]',
-      },
+      { internalType: 'address[]', name: '_addresses', type: 'address[]' },
+      { internalType: 'enum Daao.WhitelistTier[]', name: '_tiers', type: 'uint8[]' },
     ],
     name: 'addOrUpdateWhitelist',
     outputs: [],
@@ -438,42 +254,18 @@ export const CONTRACT_ABI = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    name: 'contributorIndex',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'contributorsCount',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'daoToken',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
-  {
-    inputs: [],
-    name: 'emergencyEscape',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
+  { inputs: [], name: 'emergencyEscape', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   {
     inputs: [
       { internalType: 'address[]', name: 'contracts', type: 'address[]' },
       { internalType: 'bytes[]', name: 'data', type: 'bytes[]' },
-      {
-        internalType: 'uint256[]',
-        name: 'approveAmounts',
-        type: 'uint256[]',
-      },
+      { internalType: 'uint256[]', name: 'approveAmounts', type: 'uint256[]' },
     ],
     name: 'execute',
     outputs: [],
@@ -488,13 +280,7 @@ export const CONTRACT_ABI = [
     type: 'function',
   },
   {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'newFundraisingDeadline',
-        type: 'uint256',
-      },
-    ],
+    inputs: [{ internalType: 'uint256', name: 'newFundraisingDeadline', type: 'uint256' }],
     name: 'extendFundraisingDeadline',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -539,15 +325,25 @@ export const CONTRACT_ABI = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'uint256', name: 'index', type: 'uint256' }],
+    name: 'getContributorAtIndex',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getContributorsCount',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
     name: 'getWhitelistInfo',
     outputs: [
       { internalType: 'bool', name: 'isActive', type: 'bool' },
-      {
-        internalType: 'enum Daao.WhitelistTier',
-        name: 'tier',
-        type: 'uint8',
-      },
+      { internalType: 'enum Daao.WhitelistTier', name: 'tier', type: 'uint8' },
       { internalType: 'uint256', name: 'addedAt', type: 'uint256' },
     ],
     stateMutability: 'view',
@@ -568,6 +364,20 @@ export const CONTRACT_ABI = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+    name: 'isContributor',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'isPaymentTokenNative',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'liquidityLocker',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -577,13 +387,7 @@ export const CONTRACT_ABI = [
   {
     inputs: [],
     name: 'liquidityLockerFactory',
-    outputs: [
-      {
-        internalType: 'contract ILockerFactory',
-        name: '',
-        type: 'address',
-      },
-    ],
+    outputs: [{ internalType: 'contract ILockerFactory', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -627,13 +431,7 @@ export const CONTRACT_ABI = [
     stateMutability: 'view',
     type: 'function',
   },
-  {
-    inputs: [],
-    name: 'refund',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
+  { inputs: [], name: 'refund', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   {
     inputs: [{ internalType: 'address', name: 'removedAddress', type: 'address' }],
     name: 'removeFromWhitelist',
@@ -641,13 +439,7 @@ export const CONTRACT_ABI = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-  {
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
+  { inputs: [], name: 'renounceOwnership', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   {
     inputs: [],
     name: 'symbol',
@@ -692,11 +484,7 @@ export const CONTRACT_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: 'enum Daao.WhitelistTier',
-        name: '_tier',
-        type: 'uint8',
-      },
+      { internalType: 'enum Daao.WhitelistTier', name: '_tier', type: 'uint8' },
       { internalType: 'uint256', name: '_newLimit', type: 'uint256' },
     ],
     name: 'updateTierLimit',
@@ -704,4 +492,4 @@ export const CONTRACT_ABI = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-];
+] as const;
